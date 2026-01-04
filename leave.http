@@ -1,0 +1,12 @@
+### Get all leave requests
+GET http://localhost:8080/leave/all
+
+
+### Apply for leave
+POST http://localhost:8080/leave/apply
+Content-Type: application/json
+
+{
+  "studentName": "Yuva Kiran",
+  "reason": "Medical leave"
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Create Account</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="register-body">
+
+    <div class="register-card">
+        <h2>Create Account</h2>
+
+        <form onsubmit="event.preventDefault(); reg();" autocomplete="off">
+            <div>
+                <label class="form-label">Full Name</label>
+                <input id="name" class="form-control-enhanced" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div>
+                <label class="form-label">User ID (Unique)</label>
+                <div style="position: relative;">
+                    <input id="userid" class="form-control-enhanced" placeholder="e.g. student123" required>
+                    <i class="fas fa-id-card" style="position: absolute; right: 15px; top: 15px; color: #ccc;"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label">Email Address</label>
+                <input id="email" type="email" class="form-control-enhanced" placeholder="john@example.com" required>
+            </div>
+
+            <div>
+                <label class="form-label">Password</label>
+                <input id="password" type="password" class="form-control-enhanced" placeholder="••••••••" required>
+            </div>
+
+            <div>
+                <label class="form-label">I am a...</label>
+                <select id="role" class="form-control-enhanced">
+                    <option value="STUDENT">Student</option>
+                    <option value="FACULTY">Faculty Member</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn" style="width: 100%; margin-top: 10px;">
+                Sign Up <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+            </button>
+        </form>
+
+        <div class="register-footer">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        function reg() {
+            const btn = document.querySelector('.submit-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            btn.disabled = true;
+
+            fetch("/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: document.getElementById('name').value,
+                    userId: document.getElementById('userid').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                    role: document.getElementById('role').value
+                })
+            }).then(async response => {
+                if (response.ok) {
+                    // Success animation or alert
+                    btn.innerHTML = '<i class="fas fa-check"></i> Success!';
+                    btn.style.background = '#28a745';
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 1000);
+                } else {
+                    const errorText = await response.text();
+                    alert("Registration failed: " + (errorText || response.statusText));
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }).catch(err => {
+                console.error("Error:", err);
+                alert("Network error. Please try again.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+
+</html>

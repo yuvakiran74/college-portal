@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>StudentPortal</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" onclick="showSection('apply')"><i class="fas fa-edit"></i> Apply / Book</li>
+                    <li onclick="showSection('info')"><i class="fas fa-info-circle"></i> Info</li>
+                    <li onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">Dashboard</div>
+                <div class="user-menu">
+                    <div class="user-avatar-trigger" onclick="toggleMenu()" id="userAvatar">
+                        <!-- JS will put initial here -->
+                        U
+                    </div>
+                    <div class="dropdown" id="dropdown">
+                        <div class="user-name" id="userNameDisplay">Student Name</div>
+                        <button onclick="logout()" class="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sections -->
+            <div id="content-area">
+
+                <!-- APPLY SECTION WRAPPER -->
+                <div id="apply" class="section active-section">
+                    <!-- 1. Selection Container -->
+                    <div id="applySelection" class="selection-container" style="padding-bottom: 60px;">
+                        <h2>What would you like to do?</h2>
+                        <!-- Fixed Grid Layout: 2 Columns -->
+                        <div class="selection-grid"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; max-width: 700px; margin-left: auto; margin-right: auto;">
+
+                            <!-- Leave Card -->
+                            <div class="selection-card leave-card" onclick="openApplyForm('LEAVE')"
+                                style="justify-self: center;">
+                                <div class="icon-circle">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <h3>Apply Leave</h3>
+                                <p>For one or multiple days off</p>
+                            </div>
+
+                            <!-- Outpass Card -->
+                            <div class="selection-card outpass-card" onclick="openApplyForm('OUTPASS')"
+                                style="justify-self: center;">
+                                <div class="icon-circle">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <h3>Apply Outpass</h3>
+                                <p>Short duration (less than 24h)</p>
+                            </div>
+
+                            <!-- Food Book Card (Spans full width for centering) -->
+                            <div class="selection-card"
+                                style="grid-column: 1 / -1; justify-self: center; border-top: 4px solid #ff9966;"
+                                onclick="openFoodMenu()">
+                                <div class="icon-circle"
+                                    style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <h3>Book Food</h3>
+                                <p>Pre-order from Canteen</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Form Container -->
+                    <div id="applyFormContainer" class="apply-form-container">
+                        <button class="back-btn" onclick="showSelection()">
+                            <i class="fas fa-arrow-left"></i> Back to Selection
+                        </button>
+
+                        <div class="apply-header">
+                            <h2 id="formTitle"><i class="fas fa-edit"></i> Apply</h2>
+                            <p>Fill in the details below.</p>
+                        </div>
+
+                        <div class="form-card apply-card">
+                            <form id="applyForm" onsubmit="submitForm(event)" autocomplete="off">
+                                <input type="hidden" id="leaveTypeInput" name="leaveType">
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label class="form-label" id="dateLabel">Start Date</label>
+                                        <input type="date" name="startDate" class="form-control-enhanced" required>
+                                    </div>
+                                    <div class="col" id="daysGroup">
+                                        <label class="form-label">Duration (Days)</label>
+                                        <input type="number" name="days" class="form-control-enhanced" min="1"
+                                            value="1">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Reason</label>
+                                    <textarea name="reason" rows="4" class="form-control-enhanced" required
+                                        placeholder="Please describe why you need this..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Supporting Document (Optional)</label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" name="file" class="form-control-enhanced">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="text-align: center;">
+                                    <button type="submit" class="submit-btn-centered">
+                                        <i class="fas fa-paper-plane"></i> Submit Application
+                                    </button>
+                                </div>
+                            </form>
+                            <p id="msg"></p>
+                        </div>
+                    </div>
+
+                    <!-- 3. Food Menu Container (New) -->
+                    <div id="foodMenuContainer" style="display: none; padding: 20px;">
+                        <button class="back-btn" onclick="showSelection()">
+                            <i class="fas fa-arrow-left"></i> Back to Selection
+                        </button>
+                        <h2 style="margin-bottom: 20px;"><i class="fas fa-utensils" style="color: #ff9966;"></i> Canteen
+                            Menu</h2>
+
+                        <div class="food-grid" id="foodGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INFO SECTION -->
+                <div id="info" class="section">
+                    <h2><i class="fas fa-info-circle" style="color: #4facfe;"></i> My Info</h2>
+
+                    <!-- Profile Details Block -->
+                    <div class="profile-details-card"
+                        style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
+                        <div class="large-avatar"
+                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+                            <span id="profileAvatar">U</span>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: #333; font-size: 1.2rem;">Hello, <span
+                                    id="profileName">Student</span></h3>
+                            <p style="margin: 5px 0 0; color: #777;">Student ID: <strong id="profileId"
+                                    style="color: #4facfe;">-</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="status-summary">
+                        <div class="status-card card-pending">
+                            <h3>Pending</h3>
+                            <p id="pendingCount">0</p>
+                            <i class="fas fa-clock"
+                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                        </div>
+                        <div class="status-card card-approved">
+                            <h3>Approved</h3>
+                            <p id="approvedCount">0</p>
+                            <i class="fas fa-check-circle"
+                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                        </div>
+                        <div class="status-card card-rejected">
+                            <h3>Rejected</h3>
+                            <p id="rejectedCount">0</p>
+                            <i class="fas fa-times-circle"
+                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                        </div>
+                    </div>
+
+                    <h3>Application History</h3>
+                    <div class="info-table-wrapper">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaveTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- NEW: Food Orders History -->
+                    <h3 style="margin-top: 40px; color: #ff9966;"><i class="fas fa-utensils"></i> My Food Orders</h3>
+                    <div class="info-table-wrapper">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="foodTable">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color:#999;">No orders yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SETTINGS SECTION -->
+                <div id="settings" class="section">
+                    <h2>Settings</h2>
+                    <p>Profile settings functionality coming soon...</p>
+                </div>
+
+                <!-- Global Footer -->
+                <footer class="main-footer">
+                    &copy; 2026 Lendi Institute of Engineering and Technology. All Rights Reserved.
+                </footer>
+        </main>
+    </div>
+
+    <!-- Order Summary Bar (Hidden by default) -->
+    <div id="orderSummary" class="order-summary-bar" style="display: none;">
+        <div>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Total</span>
+            <div style="font-size: 1.2rem; font-weight: bold;">₹<span id="orderTotal">0</span></div>
+        </div>
+        <button class="btn-clean"
+            style="background: white; color: #333; padding: 5px 15px; border-radius: 20px; font-weight: bold; border: none; cursor: pointer;"
+            onclick="placeOrder()">
+            Reserve Now <i class="fas fa-check"></i>
+        </button>
+    </div>
+
+    <script>
+        // Initial Setup
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || user.role !== 'STUDENT') {
+            window.location.href = 'login.html';
+        }
+
+        // Top Bar Display
+        document.getElementById("userNameDisplay").innerText = user.name || "Student";
+        const initial = (user.name || "S").charAt(0).toUpperCase();
+        document.getElementById("userAvatar").innerText = initial;
+
+        // Profile Section Display
+        document.getElementById("profileName").innerText = user.name || "Student Name";
+        document.getElementById("profileId").innerText = user.userId || "ID Not Found";
+        document.getElementById("profileAvatar").innerText = initial;
+
+        // Default load
+        loadLeaves();
+        loadFoodOrders();
+
+        // -----------------------
+        // NAVIGATION
+        // -----------------------
+        function showSelection() {
+            document.getElementById('applyFormContainer').style.display = 'none';
+            document.getElementById('foodMenuContainer').style.display = 'none';
+            document.getElementById('applySelection').style.display = 'block'; // Show cards
+            document.getElementById('orderSummary').style.display = 'none';   // Hide cart
+
+            document.getElementById("msg").innerText = "";
+        }
+
+        function showSection(sectionId) {
+            // Update Sidebar UI
+            document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Show Section
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active-section'));
+            document.getElementById(sectionId).classList.add('active-section');
+
+            // If clicking apply, reset to selection view
+            if (sectionId === 'apply') {
+                showSelection();
+            }
+        }
+
+        function toggleMenu() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        // Close dropdown on outside click
+        window.onclick = function (event) {
+            if (!event.target.closest('.user-menu')) {
+                document.getElementById('dropdown').style.display = 'none';
+            }
+        }
+
+
+        // -----------------------
+        // LEAVE / OUTPASS LOGIC
+        // -----------------------
+        function openApplyForm(type) {
+            document.getElementById('applySelection').style.display = 'none';
+            document.getElementById('applyFormContainer').style.display = 'block';
+
+            document.getElementById('leaveTypeInput').value = type;
+
+            const title = document.getElementById('formTitle');
+            const daysGroup = document.getElementById('daysGroup');
+            const dateLabel = document.getElementById('dateLabel');
+
+            if (type === 'LEAVE') {
+                title.innerHTML = '<i class="fas fa-home" style="color: #e91e63;"></i> Apply For Leave';
+                daysGroup.style.display = 'block';
+                dateLabel.innerText = "Start Date";
+            } else {
+                title.innerHTML = '<i class="fas fa-walking" style="color: #673ab7;"></i> Apply For Outpass';
+                daysGroup.style.display = 'none';
+                dateLabel.innerText = "Date";
+            }
+        }
+
+        function submitForm(e) {
+            e.preventDefault();
+            const form = document.getElementById('applyForm');
+            const formData = new FormData(form);
+
+            formData.append('studentName', user.name);
+            formData.append('studentId', user.userId);
+
+            fetch("/leave/apply", {
+                method: "POST",
+                body: formData
+            })
+                .then(res => res.text())
+                .then(msg => {
+                    document.getElementById("msg").innerHTML = `<i class="fas fa-check-circle"></i> Application Submitted!`;
+                    document.getElementById("msg").style.color = "green";
+                    form.reset();
+                    loadLeaves();
+                    setTimeout(() => showSection('info'), 1500);
+                })
+                .catch(err => {
+                    document.getElementById("msg").innerText = "Error applying.";
+                    document.getElementById("msg").style.color = "red";
+                });
+        }
+
+        function loadLeaves() {
+            fetch(`/leave/student/${user.name}`)
+                .then(res => res.json())
+                .then(data => {
+                    let rows = "";
+                    let pending = 0, approved = 0, rejected = 0;
+
+                    data.forEach(l => {
+                        if (l.status === 'PENDING') pending++;
+                        if (l.status === 'APPROVED') approved++;
+                        if (l.status === 'REJECTED') rejected++;
+
+                        let actionBtn = "-";
+                        if (l.status === 'APPROVED') {
+                            const btnText = l.leaveType === 'LEAVE' ? 'Leave Letter' : 'Outpass';
+                            const dataStr = encodeURIComponent(JSON.stringify(l));
+                            actionBtn = `<button class="btn-download" onclick="downloadLetter('${dataStr}')">
+                                <i class="fas fa-download"></i> ${btnText}
+                            </button>`;
+                        }
+
+                        rows += `<tr>
+                        <td>${l.leaveType || '-'}</td>
+                        <td>${l.startDate || '-'}</td>
+                        <td>${l.reason}</td>
+                        <td><span class="status-badge status-${l.status.toLowerCase()}">${l.status}</span></td>
+                        <td>${actionBtn}</td>
+                    </tr>`;
+                    });
+                    document.getElementById("leaveTable").innerHTML = rows;
+                    document.getElementById("pendingCount").innerText = pending;
+                    document.getElementById("approvedCount").innerText = approved;
+                    document.getElementById("rejectedCount").innerText = rejected;
+                });
+        }
+
+        function downloadLetter(dataStr) {
+            const data = JSON.parse(decodeURIComponent(dataStr));
+            const uniqueId = `LENDI-${data.leaveType}-${data.id}`;
+            const today = new Date().toLocaleDateString();
+
+            let title, bodyContent;
+
+            if (data.leaveType === 'LEAVE') {
+                title = "OFFICIAL LEAVE LETTER";
+                bodyContent = `
+                    <div class="letter-body">
+                        <p><strong>Date:</strong> ${today}</p>
+                        <p><strong>To:</strong> The Faculty In-Charge,</p>
+                        <p><strong>Subject:</strong> Application for Leave</p>
+                        <br>
+                        <p>Respected Sir/Madam,</p>
+                        <p>I am <strong>${data.studentName}</strong> (Student ID: <strong>${data.studentId}</strong>). I would like to request leave starting from <strong>${data.startDate}</strong> for <strong>${data.days} days</strong>.</p>
+                        <p><strong>Reason:</strong> ${data.reason}</p>
+                        <br>
+                        <p>My appeal has been reviewed and officially <strong>APPROVED</strong> by the faculty.</p>
+                    </div>
+                `;
+            } else {
+                title = "STUDENT OUTPASS TICKET";
+                bodyContent = `
+                    <div class="ticket-box">
+                        <div class="row">
+                            <span class="label">Student Name:</span>
+                            <span class="value">${data.studentName}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Student ID:</span>
+                            <span class="value">${data.studentId}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Valid Date:</span>
+                            <span class="value">${data.startDate}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Reason:</span>
+                            <span class="value">${data.reason}</span>
+                        </div>
+                        <div class="status-stamp">APPROVED</div>
+                    </div>
+                `;
+            }
+
+            const printWindow = window.open('', '', 'height=800,width=900');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${title} - ${uniqueId}</title>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; padding: 40px; color: #000; max-width: 800px; margin: 0 auto; }
+                        .header { text-align: center; border-bottom: 3px double #333; padding-bottom: 20px; margin-bottom: 40px; }
+                        .college-name { font-size: 28px; font-weight: bold; text-transform: uppercase; color: #1a237e; letter-spacing: 1px; margin: 0; }
+                        .doc-title { font-size: 18px; font-weight: bold; text-decoration: underline; margin-top: 15px; }
+                        .content { font-size: 18px; line-height: 1.8; margin-bottom: 50px; }
+                        .ticket-box { border: 2px dashed #333; padding: 30px; background: #fdfdfd; }
+                        .ticket-box .row { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+                        .ticket-box .label { font-weight: bold; width: 150px; display: inline-block; }
+                        .status-stamp { color: green; font-weight: bold; font-size: 24px; border: 3px solid green; padding: 10px 30px; display: inline-block; margin-top: 20px; transform: rotate(-5deg); opacity: 0.8; }
+                        .footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #ccc; padding-top: 30px; }
+                        .security-info p { margin: 5px 0; font-size: 14px; color: #555; font-family: sans-serif; }
+                        .id-pill { background: #eee; padding: 5px 10px; border-radius: 4px; font-family: monospace; font-weight: bold; font-size: 16px; }
+                        .signature { text-align: center; }
+                        .signature p { margin-top: 40px; border-top: 1px solid #333; padding-top: 10px; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 class="college-name">Lendi Institute of Engineering and Technology</h1>
+                        <div class="doc-title">${title}</div>
+                    </div>
+                    <div class="content">${bodyContent}</div>
+                    <div class="footer">
+                        <div class="security-info">
+                            <p><strong>Security Check:</strong> Scan QR to verify.</p>
+                            <p>Unique Ref ID: <span class="id-pill">${uniqueId}</span></p>
+                            <div id="qrcode" style="margin-top: 15px;"></div>
+                        </div>
+                        <div class="signature"><p>Faculty Signature</p><small>(Authorized)</small></div>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            new QRCode(document.getElementById("qrcode"), { text: "${uniqueId}", width: 128, height: 128 });
+                            setTimeout(() => { window.print(); }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // -----------------------
+        // CANTEEN LOGIC (ENHANCED & PERSISTENT)
+        // -----------------------
+
+        // Default Menu Data (Fallback)
+        const defaultMenu = [
+            { id: 1, name: "Meals", price: 80, icon: "🍲", available: 50 },
+            { id: 2, name: "Parota (2pcs)", price: 50, icon: "🫓", available: 50 },
+            { id: 3, name: "Chapathi (2pcs)", price: 40, icon: "🐢", available: 50 },
+            { id: 4, name: "Chicken Biryani", price: 150, icon: "🍗", available: 50 },
+            { id: 5, name: "Veg Biryani", price: 100, icon: "🥗", available: 50 },
+            { id: 6, name: "Fried Rice", price: 90, icon: "🍚", available: 50 },
+            { id: 7, name: "Cold Coffee", price: 30, icon: "🥤", available: 100 }
+        ];
+
+        // GLOBAL VARIABLE: Initialize from LocalStorage or Default
+        let foodMenu = JSON.parse(localStorage.getItem('canteen_inventory')) || defaultMenu;
+
+        // Ensure initialized in storage if missing (so Admin sees data)
+        if (!localStorage.getItem('canteen_inventory')) {
+            localStorage.setItem('canteen_inventory', JSON.stringify(defaultMenu));
+        }
+
+        let cart = {}; // { itemId: quantity }
+
+        function openFoodMenu() {
+            document.getElementById('applySelection').style.display = 'none';
+            document.getElementById('foodMenuContainer').style.display = 'block';
+
+            // CRITICAL: Reload from storage every time we open the menu
+            // This ensures we see updates made by the Admin immediately
+            const storedMenu = localStorage.getItem('canteen_inventory');
+            if (storedMenu) {
+                try {
+                    foodMenu = JSON.parse(storedMenu);
+                } catch (e) {
+                    console.error("Error parsing canteen inventory", e);
+                }
+            }
+            cart = {}; // Reset cart on fresh open
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('foodGrid');
+            grid.innerHTML = foodMenu.map(item => {
+                const qty = cart[item.id] || 0;
+                // Check limit (Visual only for this demo since we don't have a backend to decrement global stock)
+                const isSoldOut = item.available <= 0;
+
+                let qtyControls = `
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                        <span class="qty-val">${qty}</span>
+                        <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                    </div>`;
+
+                if (isSoldOut) {
+                    qtyControls = `<div style="color:red; font-weight:bold; margin-top:auto;">SOLD OUT</div>`;
+                }
+
+                return `
+                <div class="food-card ${isSoldOut ? 'sold-out' : ''}">
+                    <div class="food-img-frame">${item.icon}</div>
+                    <div class="food-content">
+                        <div class="food-title">${item.name}</div>
+                        <div class="food-price">₹${item.price} <small style="color:#999;font-weight:normal;">(${item.available} left)</small></div>
+                        ${qtyControls}
+                    </div>
+                </div>`;
+            }).join('');
+            updateSummary();
+        }
+
+        function updateQty(id, delta) {
+            // Find item to check limit
+            const item = foodMenu.find(i => i.id === id);
+
+            if (!cart[id]) cart[id] = 0;
+
+            const newQty = cart[id] + delta;
+
+            // Check limits
+            if (newQty > item.available) {
+                alert(`Sorry, only ${item.available} plates of ${item.name} available!`);
+                return;
+            }
+            if (newQty < 0) return;
+
+            cart[id] = newQty;
+            renderMenu();
+        }
+
+        function updateSummary() {
+            let total = 0;
+            let count = 0;
+            for (let item of foodMenu) {
+                if (cart[item.id] > 0) {
+                    total += item.price * cart[item.id];
+                    count += cart[item.id];
+                }
+            }
+            document.getElementById('orderTotal').innerText = total;
+            document.getElementById('orderSummary').style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        function placeOrder() {
+            const items = foodMenu.filter(i => cart[i.id] > 0).map(i => ({ ...i, qty: cart[i.id] }));
+            if (items.length === 0) return;
+
+            // 1. Double check availability before finalizing
+            for (let i of items) {
+                if (i.qty > i.available) {
+                    alert(`Error: ${i.name} stock has changed. Only ${i.available} left.`);
+                    cart[i.id] = i.available;
+                    renderMenu();
+                    return;
+                }
+            }
+
+            // 2. Decrement Stock & Persist
+            items.forEach(orderItem => {
+                const menuItem = foodMenu.find(m => m.id === orderItem.id);
+                if (menuItem) {
+                    menuItem.available -= orderItem.qty;
+                }
+            });
+            localStorage.setItem('canteen_inventory', JSON.stringify(foodMenu));
+
+            const total = document.getElementById('orderTotal').innerText;
+            const orderIdStr = Math.floor(1000 + Math.random() * 9000);
+            const orderId = "FOOD-" + orderIdStr;
+            const date = new Date().toLocaleDateString();
+            const time = new Date().toLocaleTimeString();
+            const uniqueId = `LENDI-FOOD-${orderIdStr}`;
+
+            // 1. Alert Success
+            alert(`Reserved Successfully! Your Order ID is ${orderId}`);
+
+            // 2. Save to History (LocalStorage)
+            const newOrder = {
+                id: orderId,
+                items: items.map(i => `${i.name} (x${i.qty})`).join(", "),
+                total: total,
+                time: `${date} ${time}`,
+                status: "RESERVED"
+            };
+
+            const existingOrders = JSON.parse(localStorage.getItem(`canteen_orders_${user.userId}`)) || [];
+            existingOrders.unshift(newOrder); // Add to top
+            localStorage.setItem(`canteen_orders_${user.userId}`, JSON.stringify(existingOrders));
+
+            // 3. Print Receipt
+            // ... (keeping existing print logic)
+            const itemsHtml = items.map(i => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px dotted #ccc;">
+                    <span>${i.name} (x${i.qty})</span>
+                    <span>₹${i.price * i.qty}</span>
+                </div>
+            `).join('');
+
+            const printWindow = window.open('', '', 'height=600,width=500');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Food Token - ${orderIdStr}</title>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                    <style>
+                        body { font-family: 'Courier New', monospace; padding: 20px; text-align: center; background: #fff8e1; }
+                        .token { border: 2px dashed #bf360c; padding: 20px; background: white; border-radius: 10px; max-width: 400px; margin: 0 auto; }
+                        .header { font-weight: bold; font-size: 1.5rem; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                        .big-number { font-size: 2.5rem; color: #bf360c; font-weight: bold; margin: 10px 0; }
+                        .items { text-align: left; margin: 20px 0; font-size: 0.9rem; }
+                        .total { font-size: 1.2rem; font-weight: bold; border-top: 2px solid #333; margin-top: 10px; padding-top: 5px; text-align: right; }
+                        .qr-area { display: flex; justify-content: center; margin-top: 20px; }
+                        .success-msg { color: green; font-weight: bold; margin-bottom: 15px; border: 1px solid green; padding: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="token">
+                        <div class="header">LENDI CANTEEN<br><span style="font-size:1rem; font-weight:normal;">Pre-order Token</span></div>
+                        <div class="success-msg">Successfully Reserved</div>
+                        <div>Date: ${date} ${time}</div>
+                        <div class="big-number">#${orderIdStr}</div>
+                        <div class="items">
+                            ${itemsHtml}
+                            <div class="total">Total: ₹${total}</div>
+                        </div>
+                        <div class="qr-area">
+                            <div id="qrcode"></div>
+                        </div>
+                        <p style="font-size:0.8rem; margin-top:10px;">Please pay at counter or show this if paid online.</p>
+                        <p style="font-size:0.7rem; color:#888;">Ref: ${uniqueId}</p>
+                    </div>
+                    <script>
+                        new QRCode(document.getElementById("qrcode"), { text: "${uniqueId}", width: 100, height: 100 });
+                        setTimeout(() => window.print(), 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+
+            // Refresh UI
+            cart = {};
+            renderMenu();
+            loadFoodOrders(); // Refresh history table
+            showSelection();
+        }
+
+        function loadFoodOrders() {
+            const orders = JSON.parse(localStorage.getItem(`canteen_orders_${user.userId}`)) || [];
+            if (orders.length === 0) return;
+
+            const rows = orders.map(o => `
+                <tr>
+                    <td><strong>${o.id}</strong></td>
+                    <td>${o.items}</td>
+                    <td>₹${o.total}</td>
+                    <td>${o.time}</td>
+                    <td><span class="status-badge status-approved">${o.status}</span></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('foodTable').innerHTML = rows;
+        }
+    </script>
+</body>
+
+</html>

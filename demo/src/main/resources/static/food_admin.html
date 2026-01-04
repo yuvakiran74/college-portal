@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Admin Specific Overrides */
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background: #ffb74d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .input-mini {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" style="background: #fff3e0;">
+            <div class="logo">
+                <h2 style="color: #e65100;">Canteen Admin</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active"><i class="fas fa-utensils"></i> Manage Menu</li>
+                    <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">Menu Management</div>
+                <div class="user-menu">
+                    <div style="font-weight: bold; color: #e65100;">Welcome, Admin</div>
+                </div>
+            </header>
+
+            <!-- Sections -->
+            <div id="content-area" class="section active-section">
+
+                <div
+                    style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2><i class="fas fa-list"></i> Current Menu Items</h2>
+                        <button class="btn-save" onclick="addNewRow()" style="background:#2196f3;"><i
+                                class="fas fa-plus"></i> Add New Item</button>
+                    </div>
+
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Icon</th>
+                                <th>Item Name</th>
+                                <th>Price (₹)</th>
+                                <th>Daily Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="btn-save" onclick="publishMenu()"
+                            style="background: #e65100; font-size: 1.1rem; padding: 10px 30px;">
+                            <i class="fas fa-check-circle"></i> Publish Final Menu
+                        </button>
+                        <p style="color:#666; font-size:0.9rem; margin-top:5px;">Click to ensure all students see the
+                            changes immediately.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Global Footer -->
+            <footer class="main-footer">
+                &copy; 2026 Lendi Institute of Engineering and Technology. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Check Auth
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || user.role !== 'FOOD_ADMIN') {
+            window.location.href = 'login.html';
+        }
+
+        // Default Data (Same as Student for fallback)
+        const defaultMenu = [
+            { id: 1, name: "Meals", price: 80, icon: "🍲", available: 50 },
+            { id: 2, name: "Parota (2pcs)", price: 50, icon: "🫓", available: 50 },
+            { id: 3, name: "Chapathi (2pcs)", price: 40, icon: "🐢", available: 50 },
+            { id: 4, name: "Chicken Biryani", price: 150, icon: "🍗", available: 50 },
+            { id: 5, name: "Veg Biryani", price: 100, icon: "🥗", available: 50 },
+            { id: 6, name: "Fried Rice", price: 90, icon: "🍚", available: 50 },
+            { id: 7, name: "Cold Coffee", price: 30, icon: "🥤", available: 100 }
+        ];
+
+        // Load Inventory
+        let foodMenu = JSON.parse(localStorage.getItem('canteen_inventory')) || defaultMenu;
+
+        function renderTable() {
+            const tbody = document.getElementById('menuTable');
+            tbody.innerHTML = foodMenu.map((item, index) => `
+                <tr>
+                    <td style="font-size:1.5rem;">${item.icon}</td>
+                    <td><input type="text" value="${item.name}" class="input-mini" style="width:150px;" onchange="updateItem(${index}, 'name', this.value)"></td>
+                    <td><input type="number" value="${item.price}" class="input-mini" onchange="updateItem(${index}, 'price', this.value)"></td>
+                    <td><input type="number" value="${item.available}" class="input-mini" onchange="updateItem(${index}, 'available', this.value)"></td>
+                    <td>
+                        <button class="btn-edit" onclick="saveData()" style="background:#4caf50; font-size:0.8rem;">Save</button>
+                        <button class="btn-edit" onclick="deleteItem(${index})" style="background:#f44336; font-size:0.8rem;"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateItem(index, field, value) {
+            if (field === 'price' || field === 'available') value = parseInt(value);
+            foodMenu[index][field] = value;
+            saveData(); // Auto save to localStorage
+        }
+
+        function saveData(showMsg = false) {
+            localStorage.setItem('canteen_inventory', JSON.stringify(foodMenu));
+            if (showMsg) alert("Item Saved Successfully!");
+        }
+
+        function publishMenu() {
+            localStorage.setItem('canteen_inventory', JSON.stringify(foodMenu));
+            alert("Menu Published! All students will definitely see these changes now.");
+        }
+
+        function addNewRow() {
+            const newId = foodMenu.length > 0 ? Math.max(...foodMenu.map(i => i.id)) + 1 : 1;
+            foodMenu.push({
+                id: newId,
+                name: "New Item",
+                price: 0,
+                icon: "🍽️",
+                available: 0
+            });
+            renderTable();
+            saveData();
+        }
+
+        function deleteItem(index) {
+            if (confirm("Are you sure you want to delete this item?")) {
+                foodMenu.splice(index, 1);
+                renderTable();
+                saveData();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        // Initial Load
+        renderTable();
+
+    </script>
+</body>
+
+</html>
