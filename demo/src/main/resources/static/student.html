@@ -24,6 +24,8 @@
                 <ul>
                     <li class="active" onclick="showSection('apply')"><i class="fas fa-edit"></i> Apply / Book</li>
                     <li onclick="showSection('info')"><i class="fas fa-info-circle"></i> Info</li>
+                    <li onclick="showSection('attendance')"><i class="fas fa-map-marker-alt"></i> Attendance</li>
+                    <li onclick="showSection('campusExplore')"><i class="fas fa-globe-americas"></i> Campus Explore</li>
                     <li onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</li>
                 </ul>
             </nav>
@@ -156,96 +158,254 @@
                     </div>
                 </div>
 
-                <!-- INFO SECTION -->
-                <div id="info" class="section">
-                    <h2><i class="fas fa-info-circle" style="color: #4facfe;"></i> My Info</h2>
+                <!-- ATTENDANCE SECTION -->
+                <div id="attendance" class="section">
 
-                    <!-- Profile Details Block -->
-                    <div class="profile-details-card"
-                        style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
-                        <div class="large-avatar"
-                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-                            <span id="profileAvatar">U</span>
-                        </div>
-                        <div>
-                            <h3 style="margin: 0; color: #333; font-size: 1.2rem;">Hello, <span
-                                    id="profileName">Student</span></h3>
-                            <p style="margin: 5px 0 0; color: #777;">Student ID: <strong id="profileId"
-                                    style="color: #4facfe;">-</strong></p>
+                    <!-- 1. Attendance Selection Menu -->
+                    <div id="attendanceSelection" class="selection-container">
+                        <h2 style="text-align: center; margin-bottom: 30px; color: #333; font-weight: 700;">Attendance
+                            Operations</h2>
+                        <div class="selection-grid"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto;">
+
+                            <!-- Post Attendance Card -->
+                            <div class="selection-card" onclick="showAttendanceSection('postAttendanceSection')"
+                                style="border-top: 4px solid #ff4757;">
+                                <div class="icon-circle"
+                                    style="background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h3>Post Attendance</h3>
+                                <p>Verify location & mark present</p>
+                            </div>
+
+                            <!-- Day-wise Attendance Card -->
+                            <div class="selection-card" onclick="showAttendanceSection('dayWiseSection')"
+                                style="border-top: 44px solid #2ed573;">
+                                <div class="icon-circle"
+                                    style="background: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%);">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <h3>Check Day-wise</h3>
+                                <p>View daily status history</p>
+                            </div>
+
+                            <!-- Monthly Attendance Card -->
+                            <div class="selection-card" onclick="showAttendanceSection('monthlySection')"
+                                style="border-top: 4px solid #1e90ff;">
+                                <div class="icon-circle"
+                                    style="background: linear-gradient(135deg, #1e90ff 0%, #70a1ff 100%);">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <h3>Monthly Report</h3>
+                                <p>Check percentage & stats</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="status-summary">
-                        <div class="status-card card-pending">
-                            <h3>Pending</h3>
-                            <p id="pendingCount">0</p>
-                            <i class="fas fa-clock"
-                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
-                        </div>
-                        <div class="status-card card-approved">
-                            <h3>Approved</h3>
-                            <p id="approvedCount">0</p>
-                            <i class="fas fa-check-circle"
-                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
-                        </div>
-                        <div class="status-card card-rejected">
-                            <h3>Rejected</h3>
-                            <p id="rejectedCount">0</p>
-                            <i class="fas fa-times-circle"
-                                style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                    <!-- 2. Post Attendance Flow -->
+                    <div id="postAttendanceSection" style="display: none; max-width: 600px; margin: 0 auto;">
+                        <button class="back-btn" onclick="showAttendanceHome()">
+                            <i class="fas fa-arrow-left"></i> Back to Menu
+                        </button>
+
+                        <div class="card-glass" style="text-align: center; position: relative; overflow: hidden;">
+                            <h2 style="margin-bottom: 10px; color: #ff4757;"><i class="fas fa-satellite-dish"></i>
+                                Location Verification</h2>
+                            <p style="margin-bottom: 30px; color: #666;">You must be within the campus premises to post
+                                attendance.</p>
+
+                            <!-- Beautiful Analyze Button -->
+                            <div class="analyze-btn-wrapper" onclick="analyseLocation()">
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring delay"></div>
+                                <div class="analyze-btn-inner">
+                                    <i class="fas fa-search-location" id="analyzeIcon"></i>
+                                </div>
+                            </div>
+                            <p style="margin-top: 20px; font-weight: 600; color: #4facfe;" id="analyzeText">Tap to
+                                Analyze</p>
+
+                            <div class="status-box" id="locationStatusBox" style="margin-top: 20px; display: none;">
+                                <i class="fas fa-search-location" id="statusIcon"></i>
+                                <p id="locationStatusText">Waiting...</p>
+                            </div>
+
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+                            <button class="btn-success-soft" id="postAttendanceBtn" onclick="postAttendance()" disabled
+                                style="width: 100%; padding: 15px; opacity: 0.5; cursor: not-allowed; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); transition: all 0.3s;">
+                                <i class="fas fa-check-circle"></i> Post Attendance
+                            </button>
                         </div>
                     </div>
 
-                    <h3>Application History</h3>
-                    <div class="info-table-wrapper">
-                        <table class="styled-table">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaveTable">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- 3. Day-wise View -->
+                    <div id="dayWiseSection" style="display: none; max-width: 500px; margin: 0 auto;">
+                        <button class="back-btn" onclick="showAttendanceHome()">
+                            <i class="fas fa-arrow-left"></i> Back to Menu
+                        </button>
+                        <h2 style="margin-bottom: 20px; color: #2ed573; text-align: center;"><i
+                                class="fas fa-calendar-alt"></i> Check Daily Status</h2>
+                        <div class="card-glass">
+                            <label class="form-label" style="text-align: center; display: block;">Select Date</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                                <input type="date" id="checkDateInput" class="form-control-enhanced">
+                                <button onclick="checkDateAttendance()"
+                                    style="background: #2ed573; color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    Check
+                                </button>
+                            </div>
 
-                    <!-- NEW: Food Orders History -->
-                    <h3 style="margin-top: 40px; color: #ff9966;"><i class="fas fa-utensils"></i> My Food Orders</h3>
-                    <div class="info-table-wrapper">
-                        <table class="styled-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Items</th>
-                                    <th>Total</th>
-                                    <th>Time</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="foodTable">
-                                <tr>
-                                    <td colspan="5" style="text-align:center; color:#999;">No orders yet.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <div id="dateResultBox"
+                                style="text-align: center; display: none; padding: 20px; background: #f9f9f9; border-radius: 12px; border: 1px dashed #ddd;">
+                                <p style="color: #666; margin-bottom: 5px;">Status for <span id="resultDate"></span></p>
+                                <h3 id="resultStatus" style="font-size: 1.8rem; margin: 0;">-</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SETTINGS SECTION -->
-                <div id="settings" class="section">
-                    <h2>Settings</h2>
-                    <p>Profile settings functionality coming soon...</p>
+                <!-- 4. Monthly View -->
+                <div id="monthlySection" style="display: none; max-width: 500px; margin: 0 auto;">
+                    <button class="back-btn" onclick="showAttendanceHome()">
+                        <i class="fas fa-arrow-left"></i> Back to Menu
+                    </button>
+                    <div class="card-glass" style="text-align: center;">
+                        <h2 style="color: #1e90ff; margin-bottom: 30px;">Monthly Overview</h2>
+
+                        <div style="position: relative; width: 150px; height: 150px; margin: 0 auto 30px;">
+                            <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none" stroke="#eee" stroke-width="3" />
+                                <path id="circleProgress"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none" stroke="#1e90ff" stroke-width="3" stroke-dasharray="0, 100" />
+                            </svg>
+                            <div
+                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; color: #333;">
+                                <span id="monthlyPercentDisplay">0%</span>
+                            </div>
+                        </div>
+
+                        <p style="color: #777;">Your attendance for this month.</p>
+                    </div>
                 </div>
 
-                <!-- Global Footer -->
-                <footer class="main-footer">
-                    &copy; 2026 Lendi Institute of Engineering and Technology. All Rights Reserved.
-                </footer>
+            </div>
+
+            <!-- INFO SECTION -->
+            <div id="info" class="section">
+                <h2><i class="fas fa-info-circle" style="color: #4facfe;"></i> My Info</h2>
+
+                <!-- Profile Details Block -->
+                <div class="profile-details-card"
+                    style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
+                    <div class="large-avatar"
+                        style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+                        <span id="profileAvatar">U</span>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: #333; font-size: 1.2rem;">Hello, <span
+                                id="profileName">Student</span></h3>
+                        <p style="margin: 5px 0 0; color: #777;">Student ID: <strong id="profileId"
+                                style="color: #4facfe;">-</strong></p>
+                    </div>
+                </div>
+
+                <div class="status-summary">
+                    <div class="status-card card-pending">
+                        <h3>Pending</h3>
+                        <p id="pendingCount">0</p>
+                        <i class="fas fa-clock"
+                            style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                    </div>
+                    <div class="status-card card-approved">
+                        <h3>Approved</h3>
+                        <p id="approvedCount">0</p>
+                        <i class="fas fa-check-circle"
+                            style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                    </div>
+                    <div class="status-card card-rejected">
+                        <h3>Rejected</h3>
+                        <p id="rejectedCount">0</p>
+                        <i class="fas fa-times-circle"
+                            style="position:absolute; right:20px; bottom:20px; opacity:0.3; font-size:3rem;"></i>
+                    </div>
+                </div>
+
+                <h3>Application History</h3>
+                <div class="info-table-wrapper">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaveTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- NEW: Food Orders History -->
+                <h3 style="margin-top: 40px; color: #ff9966;"><i class="fas fa-utensils"></i> My Food Orders</h3>
+                <div class="info-table-wrapper">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="foodTable">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color:#999;">No orders yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- CAMPUS EXPLORE SECTION -->
+            <div id="campusExplore" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2><i class="fas fa-globe-americas" style="color: #00cec9;"></i> Campus Explore</h2>
+                    <div class="filter-group">
+                        <select id="campusFilter" onchange="filterCampusPosts()"
+                            style="padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; outline: none;">
+                            <option value="ALL">All Updates</option>
+                            <option value="EVENT">Events</option>
+                            <option value="HOLIDAY">Holidays</option>
+                            <option value="EXAM">Exams</option>
+                            <option value="INFO">Info</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="campusPostsGrid" style="display: grid; gap: 20px;">
+                    <!-- Posts will be injected here -->
+                </div>
+            </div>
+
+            <!-- SETTINGS SECTION -->
+            <div id="settings" class="section">
+                <h2>Settings</h2>
+                <p>Profile settings functionality coming soon...</p>
+            </div>
+
+            <!-- Global Footer -->
+            <footer class="main-footer">
+                &copy; 2026 Lendi Institute of Engineering and Technology. All Rights Reserved.
+            </footer>
         </main>
     </div>
 
@@ -282,6 +442,66 @@
         // Default load
         loadLeaves();
         loadFoodOrders();
+        loadCampusPosts();
+
+        // -----------------------
+        // CAMPUS EXPLORE LOGIC
+        // -----------------------
+        let allCampusPosts = [];
+
+        function loadCampusPosts() {
+            console.log("Fetching campus posts...");
+            fetch("/campus/all")
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Posts fetched:", data);
+                    allCampusPosts = data;
+                    renderCampusPosts('ALL');
+                })
+                .catch(err => {
+                    console.error("Error loading posts:", err);
+                });
+        }
+
+        function filterCampusPosts() {
+            const category = document.getElementById('campusFilter').value;
+            renderCampusPosts(category);
+        }
+
+        function renderCampusPosts(category) {
+            const grid = document.getElementById('campusPostsGrid');
+            const filtered = category === 'ALL' ? allCampusPosts : allCampusPosts.filter(p => p.category === category);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="text-align: center; color: #888; padding: 40px;">No updates found in this category.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(post => {
+                let badgeColor = '#6c5ce7';
+                let icon = 'fas fa-bullhorn';
+
+                if (post.category === 'EVENT') { badgeColor = '#e17055'; icon = 'fas fa-calendar-alt'; }
+                if (post.category === 'HOLIDAY') { badgeColor = '#00b894'; icon = 'fas fa-umbrella-beach'; }
+                if (post.category === 'EXAM') { badgeColor = '#d63031'; icon = 'fas fa-book-open'; }
+
+                return `
+                <div class="post-card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid ${badgeColor}; animation: fadeIn 0.5s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <span style="background: ${badgeColor}15; color: ${badgeColor}; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">
+                            <i class="${icon}"></i> ${post.category}
+                        </span>
+                        <span style="color: #999; font-size: 0.85rem;"><i class="far fa-clock"></i> ${post.date}</span>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #2d3436; font-size: 1.3rem;">${post.title}</h3>
+                    <p style="color: #636e72; line-height: 1.6; margin: 0;">${post.content}</p>
+                    <div style="margin-top: 15px; font-size: 0.8rem; color: #b2bec3; text-align: right;">
+                        Posted by <strong>${post.facultyName || 'Faculty'}</strong>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
 
         // -----------------------
         // NAVIGATION
@@ -364,22 +584,26 @@
                 method: "POST",
                 body: formData
             })
-                .then(res => res.text())
+                .then(async res => {
+                    const msg = await res.text();
+                    if (!res.ok) throw new Error(msg);
+                    return msg;
+                })
                 .then(msg => {
-                    document.getElementById("msg").innerHTML = `<i class="fas fa-check-circle"></i> Application Submitted!`;
+                    document.getElementById("msg").innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
                     document.getElementById("msg").style.color = "green";
                     form.reset();
                     loadLeaves();
                     setTimeout(() => showSection('info'), 1500);
                 })
                 .catch(err => {
-                    document.getElementById("msg").innerText = "Error applying.";
+                    document.getElementById("msg").innerText = err.message;
                     document.getElementById("msg").style.color = "red";
                 });
         }
 
         function loadLeaves() {
-            fetch(`/leave/student/${user.name}`)
+            fetch(`/leave/student-id/${user.userId}`)
                 .then(res => res.json())
                 .then(data => {
                     let rows = "";
@@ -508,6 +732,274 @@
                 </html>
             `);
             printWindow.document.close();
+        }
+
+
+        // -----------------------
+        // ATTENDANCE LOGIC
+        // -----------------------
+        let currentLocation = null;
+
+        function showAttendanceSection(sectionId) {
+            document.getElementById('attendanceSelection').style.display = 'none';
+            document.getElementById('postAttendanceSection').style.display = 'none';
+            document.getElementById('dayWiseSection').style.display = 'none';
+            document.getElementById('monthlySection').style.display = 'none';
+
+            document.getElementById(sectionId).style.display = 'block';
+
+            if (sectionId === 'dayWiseSection') {
+                // Reset Date View
+                document.getElementById('checkDateInput').valueAsDate = new Date();
+                document.getElementById('dateResultBox').style.display = 'none';
+            }
+            if (sectionId === 'monthlySection') loadMonthlyAttendance();
+        }
+
+        function showAttendanceHome() {
+            document.getElementById('attendanceSelection').style.display = 'block';
+            document.getElementById('postAttendanceSection').style.display = 'none';
+            document.getElementById('dayWiseSection').style.display = 'none';
+            document.getElementById('monthlySection').style.display = 'none';
+
+            // Reset Analyze UI
+            document.getElementById('analyzeText').innerText = "Tap to Analyze";
+            document.getElementById('analyzeIcon').className = "fas fa-search-location";
+            document.querySelector('.analyze-btn-inner').style.background = "white";
+            document.querySelector('.analyze-btn-inner').style.color = "#4facfe";
+            document.getElementById('locationStatusBox').style.display = 'none';
+        }
+
+        function analyseLocation() {
+            const text = document.getElementById("analyzeText");
+            const icon = document.getElementById("analyzeIcon");
+            const btnInner = document.querySelector('.analyze-btn-inner');
+            const statusBox = document.getElementById("locationStatusBox");
+            const statusText = document.getElementById("locationStatusText");
+            const statusIcon = document.getElementById("statusIcon");
+            const postBtn = document.getElementById("postAttendanceBtn");
+
+            // Animation State
+            text.innerText = "Scanning...";
+            icon.className = "fas fa-satellite-dish fa-spin";
+            btnInner.style.color = "#ff4757";
+
+            if (navigator.geolocation) {
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 30000,
+                    maximumAge: 0
+                };
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // Success
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        // Accuracy info
+                        console.log("User Location:", userLat, userLng, "Accuracy:", position.coords.accuracy);
+
+                        // Call Backend for Validation
+                        fetch("/api/attendance/validate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ latitude: userLat, longitude: userLng })
+                        })
+                            .then(res => {
+                                if (!res.ok) return res.json().then(data => { throw new Error(data.message) });
+                                return res.json();
+                            })
+                            .then(data => {
+                                // Validated
+                                currentLocation = { lat: userLat, lng: userLng };
+
+                                setTimeout(() => {
+                                    text.innerText = "Verified!";
+                                    icon.className = "fas fa-check";
+                                    icon.style.animation = "none";
+                                    btnInner.style.background = "#2ecc71";
+                                    btnInner.style.color = "white";
+
+                                    statusBox.style.display = "block";
+                                    statusBox.style.background = "#d4edda";
+                                    statusText.innerText = data.message;
+                                    statusIcon.className = "fas fa-check-circle";
+                                    statusIcon.style.color = "#2ecc71";
+
+                                    postBtn.disabled = false;
+                                    postBtn.style.opacity = "1";
+                                    postBtn.style.cursor = "pointer";
+                                    postBtn.style.transform = "scale(1.05)";
+                                }, 1500);
+                            })
+                            .catch(err => {
+                                // OUT OF RANGE
+                                setTimeout(() => {
+                                    text.innerText = "Location Mismatch";
+                                    icon.className = "fas fa-exclamation-triangle";
+                                    btnInner.style.background = "#e74c3c";
+                                    btnInner.style.color = "white";
+
+                                    statusBox.style.display = "block";
+                                    statusBox.style.background = "#f8d7da";
+                                    statusText.innerHTML = err.message || "Location verification failed.";
+                                    statusIcon.className = "fas fa-times-circle";
+                                    statusIcon.style.color = "#e74c3c";
+                                }, 1500);
+                            });
+                    },
+                    (error) => {
+                        // Error
+                        text.innerText = "Failed";
+                        icon.className = "fas fa-times";
+                        btnInner.style.background = "#e74c3c";
+                        btnInner.style.color = "white";
+
+                        statusBox.style.display = "block";
+                        statusBox.style.background = "#f8d7da";
+
+                        let msg = "GPS Access Denied";
+                        if (error.code === error.TIMEOUT) msg = "Location Timed Out";
+                        if (error.code === error.POSITION_UNAVAILABLE) msg = "Location Unavailable";
+
+                        statusText.innerText = msg;
+                    },
+                    options
+                );
+            } else {
+                alert("Geolocation not supported");
+            }
+        }
+
+        function postAttendance() {
+            if (!currentLocation) return;
+
+            const payload = {
+                userId: user.userId,
+                latitude: currentLocation.lat,
+                longitude: currentLocation.lng
+            };
+
+            const btn = document.getElementById("postAttendanceBtn");
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Posting...`;
+
+            fetch("/api/attendance/mark", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        // Try to read error message
+                        return res.text().then(text => { throw new Error(text || res.statusText) });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    alert("Attendance Marked Successfully for Today!");
+                    btn.innerHTML = `<i class="fas fa-check-double"></i> Marked`;
+                    btn.disabled = true;
+                    showAttendanceHome();
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Extract clean message if possible (e.g., JSON error)
+                    let msg = err.message;
+                    try {
+                        const json = JSON.parse(msg);
+                        if (json.message) msg = json.message;
+                        else if (json.error) msg = json.error;
+                    } catch (e) { }
+
+                    alert("Failed: " + msg);
+                    btn.innerHTML = `<i class="fas fa-check-circle"></i> Post Attendance`;
+                });
+        }
+
+        function loadDayWiseAttendance() {
+            const tbody = document.getElementById("dayWiseTableBody");
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>`;
+
+            fetch(`/api/attendance/student/${user.userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No records found.</td></tr>`;
+                        return;
+                    }
+                    tbody.innerHTML = data.map(r => `
+                        <tr>
+                            <td>${r.date}</td>
+                            <td>${new Date(r.timestamp).toLocaleTimeString()}</td>
+                            <td><span class="status-badge status-approved">${r.status}</span></td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function checkDateAttendance() {
+            const dateVal = document.getElementById('checkDateInput').value;
+            if (!dateVal) {
+                alert("Please select a date first.");
+                return;
+            }
+
+            const resultBox = document.getElementById('dateResultBox');
+            const resultStatus = document.getElementById('resultStatus');
+            const resultDate = document.getElementById('resultDate');
+
+            resultBox.style.display = 'block';
+            resultStatus.innerHTML = `<i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: #4facfe;"></i>`;
+            resultDate.innerText = dateVal;
+
+            fetch(`/api/attendance/student/${user.userId}/date/${dateVal}`)
+                .then(res => {
+                    if (!res.ok) {
+                        // If 404 or other error, likely absent or error
+                        if (res.status === 404) return null; // Not found
+                        throw new Error("Error fetching status");
+                    }
+                    return res.text();
+                })
+                .then(text => {
+                    if (text && text.length > 0) {
+                        try {
+                            const data = JSON.parse(text);
+                            // Verify status explicitly
+                            if (data && data.status === 'PRESENT') {
+                                resultStatus.innerHTML = `<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> PRESENT</span>`;
+                            } else {
+                                resultStatus.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> ABSENT</span>`;
+                            }
+                        } catch (e) {
+                            // JSON parse failed?
+                            console.error("JSON parse error", e);
+                            resultStatus.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> ABSENT</span>`;
+                        }
+                    } else {
+                        // Empty response -> Absent
+                        resultStatus.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> ABSENT</span>`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    resultStatus.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> ABSENT</span>`;
+                });
+        }
+
+        function loadMonthlyAttendance() {
+            fetch(`/api/attendance/student/${user.userId}/monthly`)
+                .then(res => res.json())
+                .then(percent => {
+                    const val = Math.round(percent);
+                    document.getElementById("monthlyPercentDisplay").innerText = val + "%";
+                    // Update Circle Stroke
+                    const circle = document.getElementById("circleProgress");
+                    const circumference = 2 * Math.PI * 15.9155;
+                    const offset = circumference - (val / 100) * circumference;
+                    circle.style.strokeDasharray = `${(val / 100) * circumference} ${circumference}`;
+                });
         }
 
         // -----------------------
@@ -640,101 +1132,139 @@
             localStorage.setItem('canteen_inventory', JSON.stringify(foodMenu));
 
             const total = document.getElementById('orderTotal').innerText;
-            const orderIdStr = Math.floor(1000 + Math.random() * 9000);
-            const orderId = "FOOD-" + orderIdStr;
-            const date = new Date().toLocaleDateString();
-            const time = new Date().toLocaleTimeString();
-            const uniqueId = `LENDI-FOOD-${orderIdStr}`;
+            const itemsStr = items.map(i => `${i.name} (x${i.qty})`).join(", ");
 
-            // 1. Alert Success
-            alert(`Reserved Successfully! Your Order ID is ${orderId}`);
-
-            // 2. Save to History (LocalStorage)
-            const newOrder = {
-                id: orderId,
-                items: items.map(i => `${i.name} (x${i.qty})`).join(", "),
-                total: total,
-                time: `${date} ${time}`,
-                status: "RESERVED"
+            const payload = {
+                studentId: user.userId,
+                items: itemsStr,
+                total: parseFloat(total)
             };
 
-            const existingOrders = JSON.parse(localStorage.getItem(`canteen_orders_${user.userId}`)) || [];
-            existingOrders.unshift(newOrder); // Add to top
-            localStorage.setItem(`canteen_orders_${user.userId}`, JSON.stringify(existingOrders));
+            fetch("/api/food/order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
 
-            // 3. Print Receipt
-            // ... (keeping existing print logic)
-            const itemsHtml = items.map(i => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px dotted #ccc;">
-                    <span>${i.name} (x${i.qty})</span>
-                    <span>₹${i.price * i.qty}</span>
-                </div>
-            `).join('');
+                    const orderId = data.orderId;
+                    const uniqueId = `LENDI-${orderId}`;
+                    const date = new Date().toLocaleDateString();
+                    const time = new Date().toLocaleTimeString();
 
-            const printWindow = window.open('', '', 'height=600,width=500');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Food Token - ${orderIdStr}</title>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                    <style>
-                        body { font-family: 'Courier New', monospace; padding: 20px; text-align: center; background: #fff8e1; }
-                        .token { border: 2px dashed #bf360c; padding: 20px; background: white; border-radius: 10px; max-width: 400px; margin: 0 auto; }
-                        .header { font-weight: bold; font-size: 1.5rem; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-                        .big-number { font-size: 2.5rem; color: #bf360c; font-weight: bold; margin: 10px 0; }
-                        .items { text-align: left; margin: 20px 0; font-size: 0.9rem; }
-                        .total { font-size: 1.2rem; font-weight: bold; border-top: 2px solid #333; margin-top: 10px; padding-top: 5px; text-align: right; }
-                        .qr-area { display: flex; justify-content: center; margin-top: 20px; }
-                        .success-msg { color: green; font-weight: bold; margin-bottom: 15px; border: 1px solid green; padding: 5px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="token">
-                        <div class="header">LENDI CANTEEN<br><span style="font-size:1rem; font-weight:normal;">Pre-order Token</span></div>
-                        <div class="success-msg">Successfully Reserved</div>
-                        <div>Date: ${date} ${time}</div>
-                        <div class="big-number">#${orderIdStr}</div>
-                        <div class="items">
-                            ${itemsHtml}
-                            <div class="total">Total: ₹${total}</div>
-                        </div>
-                        <div class="qr-area">
-                            <div id="qrcode"></div>
-                        </div>
-                        <p style="font-size:0.8rem; margin-top:10px;">Please pay at counter or show this if paid online.</p>
-                        <p style="font-size:0.7rem; color:#888;">Ref: ${uniqueId}</p>
+                    alert(`Reserved Successfully! Your Order ID is ${orderId}`);
+
+                    // Update Local Inventory (Visual only)
+                    items.forEach(orderItem => {
+                        const menuItem = foodMenu.find(m => m.id === orderItem.id);
+                        if (menuItem) menuItem.available -= orderItem.qty;
+                    });
+                    localStorage.setItem('canteen_inventory', JSON.stringify(foodMenu));
+
+
+                    // Print Receipt
+                    const itemsHtml = items.map(i => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px dotted #ccc;">
+                        <span>${i.name} (x${i.qty})</span>
+                        <span>₹${i.price * i.qty}</span>
                     </div>
-                    <script>
-                        new QRCode(document.getElementById("qrcode"), { text: "${uniqueId}", width: 100, height: 100 });
-                        setTimeout(() => window.print(), 500);
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+                `).join('');
 
-            // Refresh UI
-            cart = {};
-            renderMenu();
-            loadFoodOrders(); // Refresh history table
-            showSelection();
+                    const printWindow = window.open('', '', 'height=600,width=500');
+                    printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Food Token - ${orderId}</title>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                        <style>
+                            body { font-family: 'Courier New', monospace; padding: 20px; text-align: center; background: #fff8e1; }
+                            .token { border: 2px dashed #bf360c; padding: 20px; background: white; border-radius: 10px; max-width: 400px; margin: 0 auto; }
+                            .header { font-weight: bold; font-size: 1.5rem; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                            .big-number { font-size: 2.5rem; color: #bf360c; font-weight: bold; margin: 10px 0; }
+                            .items { text-align: left; margin: 20px 0; font-size: 0.9rem; }
+                            .total { font-size: 1.2rem; font-weight: bold; border-top: 2px solid #333; margin-top: 10px; padding-top: 5px; text-align: right; }
+                            .qr-area { display: flex; justify-content: center; margin-top: 20px; }
+                            .success-msg { color: green; font-weight: bold; margin-bottom: 15px; border: 1px solid green; padding: 5px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="token">
+                            <div class="header">LENDI CANTEEN<br><span style="font-size:1rem; font-weight:normal;">Pre-order Token</span></div>
+                            <div class="success-msg">Successfully Reserved</div>
+                            <div>Date: ${date} ${time}</div>
+                            <div class="big-number">#${orderId}</div>
+                            <div class="items">
+                                ${itemsHtml}
+                                <div class="total">Total: ₹${total}</div>
+                            </div>
+                            <div class="qr-area">
+                                <div id="qrcode"></div>
+                            </div>
+                            <p style="font-size:0.8rem; margin-top:10px;">Please pay at counter or show this if paid online.</p>
+                            <p style="font-size:0.7rem; color:#888;">Ref: ${uniqueId}</p>
+                        </div>
+                        <script>
+                            new QRCode(document.getElementById("qrcode"), { text: "${uniqueId}", width: 100, height: 100 });
+                            setTimeout(() => window.print(), 500);
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                    printWindow.document.close();
+
+                    // Refresh UI
+                    cart = {};
+                    renderMenu();
+                    loadFoodOrders();
+                    showSelection();
+
+                })
+                .catch(err => {
+                    alert("Failed to place order: " + err.message);
+                });
         }
 
         function loadFoodOrders() {
-            const orders = JSON.parse(localStorage.getItem(`canteen_orders_${user.userId}`)) || [];
-            if (orders.length === 0) return;
+            fetch(`/api/food/history/${user.userId}`)
+                .then(res => res.json())
+                .then(orders => {
+                    if (orders.length === 0) {
+                        document.getElementById('foodTable').innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">No orders yet.</td></tr>`;
+                        return;
+                    }
 
-            const rows = orders.map(o => `
-                <tr>
-                    <td><strong>${o.id}</strong></td>
-                    <td>${o.items}</td>
-                    <td>₹${o.total}</td>
-                    <td>${o.time}</td>
-                    <td><span class="status-badge status-approved">${o.status}</span></td>
-                </tr>
-            `).join('');
+                    const rows = orders.map(o => `
+                    <tr>
+                        <td><strong>${o.orderId}</strong></td>
+                        <td>${o.items}</td>
+                        <td>₹${o.totalAmount}</td>
+                        <td>${new Date(o.orderTime).toLocaleString()}</td>
+                        <td><span class="status-badge status-approved">${o.status}</span></td>
+                    </tr>
+                `).join('');
 
-            document.getElementById('foodTable').innerHTML = rows;
+                    document.getElementById('foodTable').innerHTML = rows;
+                })
+                .catch(err => console.error("Error loading food history:", err));
+        }
+        // Helper: Haversine Formula for Distance Calculation
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
         }
     </script>
 </body>

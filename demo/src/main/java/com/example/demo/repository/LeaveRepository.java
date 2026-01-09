@@ -8,4 +8,8 @@ import java.util.List;
 public interface LeaveRepository extends JpaRepository<LeaveRequest, Long> {
 
     List<LeaveRequest> findByStudentName(String studentName);
+
+    List<LeaveRequest> findByStudentId(String studentId);
+
+    List<LeaveRequest> findBySection(String section);
 }

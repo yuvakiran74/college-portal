@@ -23,6 +23,6 @@ public class PageController {
 
     @GetMapping("/register")
     public String registerPage() {
-        return "redirect:/register.html";
+        return "redirect:/login.html";
     }
 }

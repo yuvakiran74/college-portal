@@ -38,9 +38,19 @@
 
             <div>
                 <label class="form-label">I am a...</label>
-                <select id="role" class="form-control-enhanced">
+                <select id="role" class="form-control-enhanced" onchange="toggleSectionField()">
                     <option value="STUDENT">Student</option>
                     <option value="FACULTY">Faculty Member</option>
+                </select>
+            </div>
+
+            <div id="sectionGroup">
+                <label class="form-label">Section</label>
+                <select id="section" class="form-control-enhanced">
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                    <option value="D">Section D</option>
                 </select>
             </div>
 
@@ -55,6 +65,23 @@
     </div>
 
     <script>
+        function toggleSectionField() {
+            const role = document.getElementById('role').value;
+            const secGroup = document.getElementById('sectionGroup');
+            if (role === 'STUDENT' || role === 'FACULTY') {
+                secGroup.style.display = 'block';
+                // Update label dynamically
+                const label = secGroup.querySelector('label');
+                if (role === 'FACULTY') label.innerText = "Assign Class Teacher for Section";
+                else label.innerText = "Section";
+            } else {
+                secGroup.style.display = 'none';
+            }
+        }
+
+        // Initialize on load
+        window.onload = toggleSectionField;
+
         function reg() {
             const btn = document.querySelector('.submit-btn');
             const originalText = btn.innerHTML;
@@ -69,7 +96,8 @@
                     userId: document.getElementById('userid').value,
                     email: document.getElementById('email').value,
                     password: document.getElementById('password').value,
-                    role: document.getElementById('role').value
+                    role: document.getElementById('role').value,
+                    section: (document.getElementById('role').value === 'STUDENT' || document.getElementById('role').value === 'FACULTY') ? document.getElementById('section').value : null
                 })
             }).then(async response => {
                 if (response.ok) {

@@ -55,7 +55,8 @@
             </div>
             <nav>
                 <ul>
-                    <li class="active"><i class="fas fa-utensils"></i> Manage Menu</li>
+                    <li class="active" onclick="switchSection('menu')"><i class="fas fa-utensils"></i> Manage Menu</li>
+                    <li onclick="switchSection('verify')"><i class="fas fa-search"></i> Check Order ID</li>
                     <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
                 </ul>
             </nav>
@@ -65,14 +66,15 @@
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
-                <div class="page-title">Menu Management</div>
+                <div class="page-title" id="pageTitle">Menu Management</div>
                 <div class="user-menu">
                     <div style="font-weight: bold; color: #e65100;">Welcome, Admin</div>
                 </div>
             </header>
 
             <!-- Sections -->
-            <div id="content-area" class="section active-section">
+            <!-- SECTION 1: MENU MANAGEMENT -->
+            <div id="menu-section" class="section active-section">
 
                 <div
                     style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
@@ -109,6 +111,32 @@
 
             </div>
 
+            <!-- SECTION 2: CHECK ID -->
+            <div id="verify-section" class="section" style="display: none;">
+                <div
+                    style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+                    <h2 style="color: #e65100; margin-bottom: 20px;"><i class="fas fa-search-dollar"></i> Verify Student
+                        Order</h2>
+                    <p style="color: #666; margin-bottom: 30px;">Enter the Order ID provided by the student (e.g.,
+                        FOOD-1234).</p>
+
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 30px;">
+                        <input type="text" id="verifyInput" placeholder="Enter Order ID"
+                            style="padding: 15px; font-size: 1.2rem; border: 2px solid #eee; border-radius: 10px; width: 60%; text-transform: uppercase;">
+                        <button onclick="verifyOrder()"
+                            style="padding: 15px 30px; font-size: 1.1rem; background: #e65100; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                            Check
+                        </button>
+                    </div>
+
+                    <div id="verificationResult"
+                        style="display: none; padding: 20px; border-radius: 10px; border: 2px dashed #ccc;">
+                        <!-- JS injects here -->
+                    </div>
+
+                </div>
+            </div>
+
             <!-- Global Footer -->
             <footer class="main-footer">
                 &copy; 2026 Lendi Institute of Engineering and Technology. All Rights Reserved.
@@ -121,6 +149,69 @@
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user || user.role !== 'FOOD_ADMIN') {
             window.location.href = 'login.html';
+        }
+
+        function switchSection(sec) {
+            document.querySelectorAll('aside li').forEach(l => l.classList.remove('active'));
+            document.getElementById('menu-section').style.display = 'none';
+            document.getElementById('verify-section').style.display = 'none';
+
+            if (sec === 'menu') {
+                document.getElementById('menu-section').style.display = 'block';
+                document.getElementById('pageTitle').innerText = "Menu Management";
+                document.querySelectorAll('aside li')[0].classList.add('active');
+            } else {
+                document.getElementById('verify-section').style.display = 'block';
+                document.getElementById('pageTitle').innerText = "Check Order ID";
+                document.querySelectorAll('aside li')[1].classList.add('active');
+                document.getElementById('verificationResult').style.display = 'none';
+                document.getElementById('verifyInput').value = '';
+            }
+        }
+
+        function verifyOrder() {
+            const id = document.getElementById('verifyInput').value.trim();
+            if (!id) return alert("Please enter an Order ID");
+
+            // Strip prefix if user typed it manually, though backend expects full id usually? 
+            // My implementation generates "FOOD-1234". Let's assume input matches exactly or we can fix common issues.
+            // Let's rely on backend check.
+
+            const resultBox = document.getElementById('verificationResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            resultBox.className = '';
+
+            fetch(`/api/food/verify/${id}`, { method: 'POST' })
+                .then(res => {
+                    if (res.status === 404) return { status: 'INVALID', message: 'Invalid Order ID' };
+                    return res.json();
+                })
+                .then(data => {
+                    let color = "red";
+                    let icon = "times-circle";
+
+                    if (data.status === 'SUCCESS') {
+                        color = "green";
+                        icon = "check-circle";
+                    } else if (data.status === 'ALREADY_COMPLETED') {
+                        color = "#f39c12"; // Orange
+                        icon = "exclamation-triangle";
+                    }
+
+                    resultBox.style.background = (data.status === 'SUCCESS') ? '#d4edda' : (data.status === 'ALREADY_COMPLETED' ? '#fff3cd' : '#f8d7da');
+
+                    resultBox.innerHTML = `
+                    <div style="color: ${color}; font-size: 1.5rem; margin-bottom: 10px;">
+                        <i class="fas fa-${icon}"></i> <strong>${data.message}</strong>
+                    </div>
+                    ${data.items ? `<div style="color: #333; font-size: 1rem;"><strong>Items:</strong> ${data.items}</div>` : ''}
+                    ${data.studentId ? `<div style="color: #666; font-size: 0.9rem;">Student ID: ${data.studentId}</div>` : ''}
+                `;
+                })
+                .catch(err => {
+                    resultBox.innerHTML = `<span style="color:red">Error contacting server.</span>`;
+                });
         }
 
         // Default Data (Same as Student for fallback)

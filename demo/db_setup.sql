@@ -23,6 +23,16 @@ CREATE TABLE IF NOT EXISTS leave_request (
     document_path VARCHAR(500)
 );
 
+-- Attendance Table
+CREATE TABLE IF NOT EXISTS attendance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    status VARCHAR(50) NOT NULL, -- 'PRESENT' or 'ABSENT'
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 -- Optional: Insert a test student to verify login immediately
 -- Password is 'password' (you might need to use plain text if you aren't hashing, or hashed if you are)
 -- INSERT INTO users (user_id, name, email, password, role) VALUES ('teststudent', 'Test Student', 'test@example.com', 'password', 'STUDENT');

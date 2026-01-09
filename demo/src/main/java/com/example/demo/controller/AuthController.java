@@ -22,7 +22,16 @@ public class AuthController {
             if (repo.findByUserIdAndPassword(user.getUserId(), user.getPassword()).isPresent()) {
                 return ResponseEntity.badRequest().body("User ID already exists");
             }
+
+            // Validate One Class Teacher per Section
+            if ("FACULTY".equals(user.getRole()) && user.getSection() != null) {
+                if (repo.existsByRoleAndSection("FACULTY", user.getSection())) {
+                    return ResponseEntity.badRequest()
+                            .body("Section " + user.getSection() + " already has a Class Teacher.");
+                }
+            }
             User savedUser = repo.save(user);
+            System.out.println("Registered User: " + savedUser.getUserId() + " Role: " + savedUser.getRole());
             return ResponseEntity.ok(savedUser);
         } catch (Exception e) {
             e.printStackTrace();

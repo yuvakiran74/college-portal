@@ -113,12 +113,25 @@
 <body>
 
     <div class="dashboard-container">
-        <!-- Top Bar (Full Width) -->
-        <main class="main-content" style="margin-left: 0;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>FacultyPortal</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+                    <li onclick="showSection('create')"><i class="fas fa-plus-circle"></i> Create Post</li>
+                    <li onclick="showSection('edit')"><i class="fas fa-edit"></i> Edit Post</li>
+                    <li onclick="showSection('attendance')"><i class="fas fa-clipboard-list"></i> Attendance</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
             <header class="top-bar">
-                <div class="page-title" style="font-weight: 700; color: #4facfe;">
-                    <i class="fas fa-chalkboard-teacher"></i> Faculty Portal
-                </div>
+                <div class="page-title">Dashboard</div>
                 <div class="user-menu">
                     <div class="menu-trigger" onclick="toggleMenu()">
                         <div class="small-logo" style="width: 40px; height: 40px; font-size: 1.2rem;">F</div>
@@ -130,62 +143,257 @@
                 </div>
             </header>
 
-            <div id="content-area" style="padding: 40px; max-width: 1200px; margin: 0 auto;">
+            <div id="content-area">
 
-                <!-- Stats Cards -->
-                <div class="stats-container">
-                    <div class="stat-card pending active" onclick="filterData('PENDING', this)">
-                        <div class="stat-info">
-                            <h3 id="count-pending">0</h3>
-                            <p>Pending Requests</p>
+                <!-- ATTENDANCE VIEW -->
+                <div id="attendance" class="section">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;">
+
+                        <div>
+                            <h2><i class="fas fa-clipboard-list" style="color: #4facfe;"></i> Student Attendance</h2>
+
+                            <!-- Filters -->
+                            <div style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
+                                <select id="sectionSelect" class="form-control-enhanced"
+                                    style="width: auto; padding: 8px;" onchange="loadAttendanceData()">
+                                    <option value="" disabled selected>Select Section</option>
+                                    <option value="A">Section A</option>
+                                    <option value="B">Section B</option>
+                                    <option value="C">Section C</option>
+                                    <option value="D">Section D</option>
+                                </select>
+
+                                <input type="date" id="attendanceDate" class="form-control-enhanced"
+                                    style="width: auto; padding: 8px;" onchange="loadAttendanceData()">
+                            </div>
                         </div>
-                        <i class="fas fa-clock stat-icon"></i>
+
+                        <!-- Actions -->
+                        <div style="display: flex; gap: 10px; flex-direction: column; align-items: flex-end;">
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-clean" onclick="loadAttendanceData()"
+                                    style="background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer;">
+                                    <i class="fas fa-sync-alt"></i> Load
+                                </button>
+                            </div>
+
+                            <!-- Download Options -->
+                            <div class="dropdown" style="display: block; position: relative;">
+                                <button class="btn-save"
+                                    style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;"
+                                    onclick="toggleDownloadMenu()">
+                                    <i class="fas fa-file-excel"></i> Download Excel
+                                </button>
+                                <div id="downloadMenu"
+                                    style="display: none; position: absolute; right: 0; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; z-index: 100;">
+                                    <div onclick="downloadReport('DAILY')"
+                                        style="padding: 10px 20px; cursor: pointer; border-bottom: 1px solid #eee;">
+                                        Daily (Selected Date)</div>
+                                    <div onclick="downloadReport('MONTHLY')"
+                                        style="padding: 10px 20px; cursor: pointer;">Monthly (This Month)</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card approved" onclick="filterData('APPROVED', this)">
-                        <div class="stat-info">
-                            <h3 id="count-approved">0</h3>
-                            <p>Approved</p>
-                        </div>
-                        <i class="fas fa-check-circle stat-icon"></i>
-                    </div>
-                    <div class="stat-card rejected" onclick="filterData('REJECTED', this)">
-                        <div class="stat-info">
-                            <h3 id="count-rejected">0</h3>
-                            <p>Rejected</p>
-                        </div>
-                        <i class="fas fa-times-circle stat-icon"></i>
+
+                    <div class="info-table-wrapper">
+                        <table class="styled-table" id="attendanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Content Table -->
-                <h2 id="tableTitle" style="margin-bottom: 20px; color: #444;">Pending Applications</h2>
+                <!-- DASHBOARD SECTION (Default) -->
+                <div id="dashboard" class="section active-section">
+                    <!-- Stats Cards -->
+                    <div class="stats-container">
+                        <div class="stat-card pending active" onclick="filterData('PENDING', this)">
+                            <div class="stat-info">
+                                <h3 id="count-pending">0</h3>
+                                <p>Pending Requests</p>
+                            </div>
+                            <i class="fas fa-clock stat-icon"></i>
+                        </div>
+                        <div class="stat-card approved" onclick="filterData('APPROVED', this)">
+                            <div class="stat-info">
+                                <h3 id="count-approved">0</h3>
+                                <p>Approved</p>
+                            </div>
+                            <i class="fas fa-check-circle stat-icon"></i>
+                        </div>
+                        <div class="stat-card rejected" onclick="filterData('REJECTED', this)">
+                            <div class="stat-info">
+                                <h3 id="count-rejected">0</h3>
+                                <p>Rejected</p>
+                            </div>
+                            <i class="fas fa-times-circle stat-icon"></i>
+                        </div>
+                    </div>
 
-                <table id="requestsTable">
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Reason</th>
-                            <th id="actionHeader">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+                    <!-- Content Table -->
+                    <h2 id="tableTitle" style="margin-bottom: 20px; color: #444;">Pending Applications</h2>
+
+                    <table id="requestsTable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th id="actionHeader">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CREATE POST SECTION -->
+                <div id="create" class="section">
+                    <div
+                        style="max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                        <h2 style="margin-bottom: 30px; color: #6c5ce7;"><i class="fas fa-bullhorn"></i> Create New Post
+                        </h2>
+                        <form onsubmit="submitPost(event)">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label class="form-label" style="font-weight: 600;">Title of the Update</label>
+                                <input type="text" id="postTitle" required class="form-control-enhanced"
+                                    placeholder="e.g. Annual Sports Meet 2026">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label class="form-label" style="font-weight: 600;">Category</label>
+                                <select id="postCategory" required class="form-control-enhanced">
+                                    <option value="EVENT">Event</option>
+                                    <option value="HOLIDAY">Holiday</option>
+                                    <option value="EXAM">Exam Update</option>
+                                    <option value="INFO">General Info</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 30px;">
+                                <label class="form-label" style="font-weight: 600;">Content / Details</label>
+                                <textarea id="postContent" rows="8" required class="form-control-enhanced"
+                                    placeholder="Write the details here..."></textarea>
+                            </div>
+
+                            <button type="submit"
+                                style="width: 100%; padding: 15px; background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s;">
+                                <i class="fas fa-paper-plane"></i> Publish to Students
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- EDIT POST SECTION -->
+                <div id="edit" class="section">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h2><i class="fas fa-edit" style="color: #00cec9;"></i> Manage Posts</h2>
+                    </div>
+                    <div id="managePostsGrid" style="display: grid; gap: 20px;">
+                        <!-- JS injected -->
+                    </div>
+                </div>
+
+                <!-- HIDDEN UPDATE FORM (shown when editing) -->
+                <div id="updateFormContainer" class="section">
+                    <button onclick="showSection('edit')" class="back-btn"><i class="fas fa-arrow-left"></i> Back to
+                        List</button>
+                    <div
+                        style="max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-top: 5px solid #00cec9;">
+                        <h2 style="margin-bottom: 30px; color: #00cec9;">Edit Post</h2>
+                        <form onsubmit="submitUpdate(event)">
+                            <input type="hidden" id="editPostId">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label class="form-label">Title</label>
+                                <input type="text" id="editPostTitle" required class="form-control-enhanced">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label class="form-label">Category</label>
+                                <select id="editPostCategory" required class="form-control-enhanced">
+                                    <option value="EVENT">Event</option>
+                                    <option value="HOLIDAY">Holiday</option>
+                                    <option value="EXAM">Exam Update</option>
+                                    <option value="INFO">General Info</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 30px;">
+                                <label class="form-label">Content</label>
+                                <textarea id="editPostContent" rows="8" required
+                                    class="form-control-enhanced"></textarea>
+                            </div>
+
+                            <button type="submit"
+                                style="width: 100%; padding: 15px; background: #00cec9; color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer;">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
 
             </div>
         </main>
     </div>
 
+
+
     <script>
+        // SECTION NAVIGATION
+        function showSection(sectionId) {
+            // Sidebar Active State
+            document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+            // Find the list item that calls this function (rough match)
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                if (li.getAttribute('onclick').includes(sectionId)) li.classList.add('active');
+            });
+
+            // Show Section
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active-section'));
+
+            // Special handling for edit/update
+            if (sectionId === 'edit') {
+                loadManagePosts();
+                document.getElementById('edit').classList.add('active-section');
+            } else if (sectionId === 'dashboard') {
+                document.getElementById('dashboard').classList.add('active-section');
+            } else if (sectionId === 'create') {
+                document.getElementById('create').classList.add('active-section');
+            } else {
+                document.getElementById(sectionId).classList.add('active-section');
+            }
+        }
+
+        // --- EXISTING LEAVE REQUEST LOGIC ---
         let allRequests = [];
         let currentFilter = 'PENDING';
 
         function loadData() {
-            fetch("/leave/all")
+            const currentUser = JSON.parse(localStorage.getItem('user'));
+            if (!currentUser || !currentUser.section) {
+                console.error("No section assigned to faculty");
+                // Fallback or alert? For now, fetch generic or empty
+                // fetch("/leave/all") ... No, user requirement says only their section.
+                alert("You are not assigned to a section. Please contact Admin.");
+                return;
+            }
+
+            fetch(`/leave/section/${currentUser.section}`)
                 .then(res => res.json())
                 .then(data => {
                     allRequests = data;
@@ -202,15 +410,12 @@
 
         function filterData(status, card) {
             currentFilter = status;
-
-            // UI Update
             document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
             card.classList.add('active');
-
-            // Title Update
-            const titles = { 'PENDING': 'Pending Applications', 'APPROVED': 'Approved History', 'REJECTED': 'Rejected History' };
+            const titles = {
+                'PENDING': 'Pending Applications', 'APPROVED': 'Approved History', 'REJECTED': 'Rejected History'
+            };
             document.getElementById('tableTitle').innerText = titles[status];
-
             renderTable();
         }
 
@@ -219,44 +424,132 @@
             const tbody = document.getElementById('tableBody');
             const actionHeader = document.getElementById('actionHeader');
 
-            // Show/Hide Action Column
-            if (currentFilter === 'PENDING') {
-                actionHeader.style.display = '';
-            } else {
-                actionHeader.style.display = 'none';
-            }
+            if (currentFilter === 'PENDING') actionHeader.style.display = '';
+            else actionHeader.style.display = 'none';
 
             let rows = "";
             if (filtered.length === 0) {
-                rows = `<tr><td colspan="6" style="text-align:center; padding: 40px; color: #999;">No records found</td></tr>`;
+                rows = `<tr>
+        <td colspan="6" style="text-align:center; padding: 40px; color: #999;">No records found</td>
+    </tr>`;
             } else {
                 filtered.forEach(r => {
                     rows += `<tr>
-                        <td style="font-weight: 600; color: #4facfe;">${r.studentId || 'N/A'}</td>
-                        <td>${r.studentName}</td>
-                        <td><span class="status-badge status-${r.status.toLowerCase()}">${r.leaveType}</span></td>
-                        <td>${r.startDate}</td>
-                        <td style="max-width: 300px;">${r.reason}</td>
-                        ${currentFilter === 'PENDING' ? `
-                        <td>
-                            <button class="action-btn btn-approve" onclick="updateStatus(${r.id}, 'approve')">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="action-btn btn-reject" onclick="updateStatus(${r.id}, 'reject')">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </td>` : ''}
-                    </tr>`;
+        <td style="font-weight: 600; color: #4facfe;">${r.studentId || 'N/A'}</td>
+        <td>${r.studentName}</td>
+        <td><span class="status-badge status-${r.status.toLowerCase()}">${r.leaveType}</span></td>
+        <td>${r.startDate}</td>
+        <td style="max-width: 300px;">${r.reason}</td>
+        ${currentFilter === 'PENDING' ? `
+        <td>
+            <button class="action-btn btn-approve" onclick="updateStatus(${r.id}, 'approve')"><i
+                    class="fas fa-check"></i></button>
+            <button class="action-btn btn-reject" onclick="updateStatus(${r.id}, 'reject')"><i
+                    class="fas fa-times"></i></button>
+        </td>` : ''}
+    </tr>`;
                 });
             }
             tbody.innerHTML = rows;
         }
 
         function updateStatus(id, action) {
-            fetch(`/leave/${action}/${id}`, { method: "PUT" })
-                .then(() => {
-                    loadData(); // Reload all data to refresh counts and table
+            fetch(`/leave/${action}/${id}`, { method: "PUT" }).then(() => loadData());
+        }
+
+        // --- NEW: POST MANAGEMENT LOGIC ---
+
+        // 1. Create Post
+        function submitPost(e) {
+            e.preventDefault();
+            const postData = {
+                title: document.getElementById('postTitle').value,
+                content: document.getElementById('postContent').value,
+                category: document.getElementById('postCategory').value,
+                facultyName: "Faculty Admin"
+            };
+
+            fetch("/campus/post", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(postData)
+            }).then(res => {
+                if (!res.ok) throw new Error("Failed");
+                alert("Post Published Successfully!");
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postContent').value = '';
+                showSection('dashboard');
+            }).catch(err => alert("Error posting"));
+        }
+
+        // 2. Load and Manage Posts
+        function loadManagePosts() {
+            fetch("/campus/all")
+                .then(res => res.json())
+                .then(posts => {
+                    const grid = document.getElementById('managePostsGrid');
+                    if (posts.length === 0) {
+                        grid.innerHTML = '<p>No posts found.</p>';
+                        return;
+                    }
+                    grid.innerHTML = posts.map(p => `
+    <div
+        style="background: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+        <div>
+            <span style="font-weight: bold; color: #333;">${p.title}</span>
+            <span
+                style="background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 10px;">${p.category}</span>
+            <p style="margin: 5px 0 0; color: #777; font-size: 0.9rem;">${p.content.substring(0, 50)}...</p>
+        </div>
+        <button onclick="openEditForm(${p.id})"
+            style="background: #00cec9; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">
+            Edit
+        </button>
+    </div>
+    `).join('');
                 });
+        }
+
+        let currentEditId = null;
+
+        function openEditForm(id) {
+            // Find post data (in a real app, maybe fetch by ID)
+            fetch("/campus/all") // Efficient? No, but works for demo
+                .then(res => res.json())
+                .then(posts => {
+                    const post = posts.find(p => p.id === id);
+                    if (post) {
+                        currentEditId = id;
+                        document.getElementById('editPostId').value = post.id;
+                        document.getElementById('editPostTitle').value = post.title;
+                        document.getElementById('editPostCategory').value = post.category;
+                        document.getElementById('editPostContent').value = post.content;
+
+                        document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+                        document.getElementById('updateFormContainer').classList.add('active-section');
+                    }
+                });
+        }
+
+        function submitUpdate(e) {
+            e.preventDefault();
+            const postData = {
+                id: currentEditId,
+                title: document.getElementById('editPostTitle').value,
+                content: document.getElementById('editPostContent').value,
+                category: document.getElementById('editPostCategory').value,
+                facultyName: "Faculty Admin"
+            };
+
+            // Re-use POST endpoint which uses .save() (Upsert)
+            fetch("/campus/post", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(postData)
+            }).then(() => {
+                alert("Post Updated!");
+                showSection('edit');
+            });
         }
 
         // Toggle Dropdown
@@ -269,7 +562,6 @@
             window.location.href = "login.html";
         }
 
-        // Close dropdown on outside click
         window.onclick = function (event) {
             if (!event.target.closest('.user-menu')) {
                 document.getElementById('dropdown').style.display = 'none';
@@ -278,6 +570,99 @@
 
         // Initial Load
         loadData();
+
+        // -----------------------
+        // ATTENDANCE LOGIC
+        // -----------------------
+        function loadAttendanceData() {
+            const section = document.getElementById('sectionSelect').value;
+            const date = document.getElementById('attendanceDate').value;
+            const tbody = document.getElementById('attendanceTableBody');
+
+            // If no section selected, show message or nothing
+            if (!section) {
+                // Try to load all if user wants? Or wait for selection. User asked for filtering.
+                // Let's default to "Please Select Section"
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">Please Select a Section</td></tr>`;
+                return;
+            }
+
+            // Fetch by section and date
+            let url = `/api/attendance/section?section=${section}`;
+            if (date) url += `&date=${date}`;
+
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No attendance records found for ${section}.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(record => {
+                        return `
+                        <tr>
+                            <td style="font-weight: bold; color: #555;">${record.userId}</td>
+                            <td>${record.date}</td>
+                            <td>${new Date(record.timestamp).toLocaleTimeString()}</td>
+                            <td><span class="status-badge status-approved">${record.status}</span></td>
+                        </tr>
+                        `;
+                    }).join('');
+                })
+                .catch(err => {
+                    console.error("Error loading attendance", err);
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Error loading data.</td></tr>`;
+                });
+        }
+
+        function toggleDownloadMenu() {
+            const menu = document.getElementById('downloadMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('downloadMenu').style.display = 'none';
+            }
+        });
+
+        function downloadReport(type) {
+            const section = document.getElementById('sectionSelect').value;
+            const date = document.getElementById('attendanceDate').value;
+
+            if (!section) return alert("Please select a section first.");
+
+            let url = `/api/attendance/download?section=${section}&type=${type}`;
+
+            if (type === 'DAILY') {
+                if (!date) return alert("Please select a date for daily report.");
+                url += `&date=${date}`;
+            } else {
+                // Default to current month/year for now as we don't have month picker UI
+                const now = new Date();
+                url += `&month=${now.getMonth() + 1}&year=${now.getFullYear()}`;
+            }
+
+            // Trigger Download
+            window.location.href = url;
+        }
+
+        // Set default date to today
+        document.getElementById('attendanceDate').valueAsDate = new Date();
+
+        // Hook into showSection to load data when tab is clicked
+        const originalShowSection = showSection;
+        showSection = function (sectionId) {
+            originalShowSection(sectionId);
+            if (sectionId === 'attendance') {
+                // Don't auto load if no section selected, just leave it blank
+                loadAttendanceData();
+            }
+        };
     </script>
 
 </body>

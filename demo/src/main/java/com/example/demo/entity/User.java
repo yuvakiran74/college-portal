@@ -16,6 +16,7 @@ public class User {
     private String email;
     private String password;
     private String role; // STUDENT or FACULTY
+    private String section;
 
     public Long getId() {
         return id;
@@ -63,5 +64,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 }

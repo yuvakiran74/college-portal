@@ -24,6 +24,14 @@ public class LeaveService {
         return repo.findByStudentName(name);
     }
 
+    public List<LeaveRequest> getLeavesByStudentId(String studentId) {
+        return repo.findByStudentId(studentId);
+    }
+
+    public List<LeaveRequest> getLeavesBySection(String section) {
+        return repo.findBySection(section);
+    }
+
     public List<LeaveRequest> getAllLeaves() {
         return repo.findAll();
     }

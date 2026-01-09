@@ -12,14 +12,15 @@
     <div class="landing-page">
         <!-- HEADER: Logo -->
         <header class="landi-header">
-            <img src="https://www.lendi.edu.in/assets/img/lendi-full-logo.png" alt="Lendi Logo" class="landi-logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXU-qSU9tfDChNih36yidDV4CUsZsklEVNLQ&s"
+                alt="Lendi Logo" class="landi-logo">
             <!-- Optional: Link back to main site or simple nav -->
             <div style="font-weight: 500; color: #555;">Student & Faculty Portal</div>
         </header>
 
         <!-- HERO IMAGE: Rectangle Banner -->
         <div class="hero-banner-wrapper">
-            <img src="https://lendi.edu.in//cloud/lendi-institute.jpg" alt="Lendi Institute" class="hero-banner">
+            <img src="https://www.lendi.edu.in/cloud/lendi-institute.jpg" alt="Lendi Institute" class="hero-banner">
         </div>
 
         <!-- CONTENT SECTION: Scrollable -->
@@ -32,7 +33,6 @@
 
             <div class="landing-actions">
                 <button class="btn-land btn-login" onclick="openLoginModal()">Login to Portal</button>
-                <a href="register.html" class="btn-land btn-register">Register New Account</a>
             </div>
 
             <!-- Scrollable Content Demo -->
@@ -70,6 +70,10 @@
                     style="background: #e0f2f1; color: #00695c;">
                     <i class="fas fa-utensils"></i><br>Food Admin
                 </button>
+                <button class="role-btn admin-main" onclick="showLoginForm('ADMIN')"
+                    style="background: #ffebee; color: #c62828;">
+                    <i class="fas fa-user-shield"></i><br>Admin
+                </button>
             </div>
 
             <!-- Step 2: Login Form -->
@@ -85,6 +89,17 @@
                         <input type="password" id="password" class="input-field" placeholder="Enter Password" required>
                     </div>
 
+                    <div class="input-group" id="loginSectionGroup" style="display: none;">
+                        <label>Section</label>
+                        <select id="loginSection" class="input-field">
+                            <option value="" disabled selected>Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
+
                     <p id="msg" style="color: red; font-size: 14px; margin-bottom: 10px;"></p>
 
                     <button class="primary-btn">Login</button>
@@ -98,6 +113,9 @@
 
     <script>
         let selectedRole = "";
+
+        // Clear any previous session on load
+        localStorage.removeItem("user");
 
         // Unused authToggle removed as new UI uses direct buttons
 
@@ -121,10 +139,20 @@
             let title = 'Login';
             if (role === 'STUDENT') title = 'Student Login';
             else if (role === 'FACULTY') title = 'Faculty Login';
-            else title = 'Canteen Admin Login';
+            else if (role === 'FACULTY') title = 'Faculty Login';
+            else if (role === 'FOOD_ADMIN') title = 'Canteen Admin Login';
+            else title = 'System Admin Login';
 
             document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalSubtitle').innerText = 'Enter your credentials';
+
+            // Show Section only for Student
+            if (role === 'STUDENT') {
+                document.getElementById('loginSectionGroup').style.display = 'block';
+            } else {
+                document.getElementById('loginSectionGroup').style.display = 'none';
+            }
         }
 
         function backToRoles() {
@@ -148,19 +176,7 @@
                 return;
             }
 
-            // Food Admin Hardcoded Check
-            if (selectedRole === 'FOOD_ADMIN') {
-                if (userId === "LendiFood" && password === "Food@Lendi987") {
-                    const adminUser = { name: "Canteen Admin", role: "FOOD_ADMIN", userId: "LendiFood" };
-                    localStorage.setItem("user", JSON.stringify(adminUser));
-                    window.location.href = "food_admin.html";
-                    return;
-                } else {
-                    msg.innerText = "Invalid Admin Credentials";
-                    return;
-                }
-            }
-
+            // Server-side authentication for all roles
             fetch("/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -188,9 +204,22 @@
                     localStorage.setItem("user", JSON.stringify(user));
 
                     if (user.role === "STUDENT") {
+                        const selectedSection = document.getElementById("loginSection").value;
+                        if (!selectedSection) {
+                            msg.innerText = "Please select your section";
+                            return;
+                        }
+                        if (user.section && user.section !== selectedSection) {
+                            msg.innerText = "Incorrect section selected";
+                            return;
+                        }
                         window.location.href = "/student.html";
-                    } else {
+                    } else if (user.role === "FACULTY") {
                         window.location.href = "/faculty.html";
+                    } else if (user.role === "FOOD_ADMIN") {
+                        window.location.href = "/food_admin.html";
+                    } else if (user.role === "ADMIN") {
+                        window.location.href = "/admin_dashboard.html";
                     }
                 })
                 .catch(() => {

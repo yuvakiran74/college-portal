@@ -11,6 +11,7 @@ public class LeaveRequest {
 
     private String studentName;
     private String studentId; // New field for User ID
+    private String section; // Section of the student
     private String reason;
     private String status = "PENDING"; // Default to PENDING
 
@@ -65,6 +66,14 @@ public class LeaveRequest {
 
     public void setStudentId(String studentId) {
         this.studentId = studentId;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 
     public void setReason(String reason) {

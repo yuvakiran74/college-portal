@@ -18,14 +18,15 @@ import java.util.List;
 public class LeaveController {
 
     private final LeaveService service;
+    private final com.example.demo.repository.UserRepository userRepo;
 
-    public LeaveController(LeaveService service) {
+    public LeaveController(LeaveService service, com.example.demo.repository.UserRepository userRepo) {
         this.service = service;
+        this.userRepo = userRepo;
     }
 
-    // Student applies leave
     @PostMapping("/apply")
-    public String applyLeave(
+    public org.springframework.http.ResponseEntity<String> applyLeave(
             @RequestParam("studentName") String studentName,
             @RequestParam("studentId") String studentId,
             @RequestParam("reason") String reason,
@@ -33,38 +34,76 @@ public class LeaveController {
             @RequestParam("leaveType") String leaveType,
             @RequestParam(value = "days", required = false) Integer days,
             @RequestParam(value = "file", required = false) MultipartFile file) {
-        LeaveRequest request = new LeaveRequest();
-        request.setStudentName(studentName);
-        request.setStudentId(studentId);
-        request.setReason(reason);
-        request.setStartDate(startDate);
-        request.setLeaveType(leaveType);
-        request.setDays(days);
 
-        if (file != null && !file.isEmpty()) {
-            try {
-                String uploadDir = "uploads/";
-                File dir = new File(uploadDir);
-                if (!dir.exists())
-                    dir.mkdirs();
+        try {
+            String cleanId = studentId.trim();
+            com.example.demo.entity.User student = userRepo.findByUserId(cleanId).orElse(null);
 
-                String filePath = uploadDir + file.getOriginalFilename();
-                Files.write(Paths.get(filePath), file.getBytes());
-                request.setDocumentPath(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "Error uploading file";
+            if (student == null) {
+                System.out.println("ERROR: Student ID not found: " + cleanId);
+                return org.springframework.http.ResponseEntity.badRequest()
+                        .body("Error: Student ID not found in records.");
             }
-        }
 
-        service.applyLeave(request);
-        return "Leave applied successfully";
+            if (student.getSection() == null || student.getSection().isEmpty()) {
+                System.out.println("ERROR: Student has no section assigned: " + cleanId);
+                return org.springframework.http.ResponseEntity.badRequest()
+                        .body("Error: Your profile has no assigned section. Contact Admin.");
+            }
+
+            LeaveRequest request = new LeaveRequest();
+            request.setStudentName(studentName);
+            request.setStudentId(cleanId);
+            request.setSection(student.getSection()); // Reliable assignment
+
+            System.out.println("Applying leave for: " + cleanId + " Section: " + student.getSection());
+
+            request.setReason(reason);
+            request.setStartDate(startDate);
+            request.setLeaveType(leaveType);
+            request.setDays(days);
+
+            if (file != null && !file.isEmpty()) {
+                try {
+                    String uploadDir = "uploads/";
+                    File dir = new File(uploadDir);
+                    if (!dir.exists())
+                        dir.mkdirs();
+
+                    String filePath = uploadDir + file.getOriginalFilename();
+                    Files.write(Paths.get(filePath), file.getBytes());
+                    request.setDocumentPath(filePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return org.springframework.http.ResponseEntity.status(500)
+                            .body("Error uploading file: " + e.getMessage());
+                }
+            }
+
+            service.applyLeave(request);
+            return org.springframework.http.ResponseEntity.ok("Application Submitted Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return org.springframework.http.ResponseEntity.status(500).body("Internal Error: " + e.getMessage());
+        }
     }
 
     // Student views his leaves
     @GetMapping("/student/{name}")
     public List<LeaveRequest> studentLeaves(@PathVariable String name) {
         return service.getLeavesByStudent(name);
+    }
+
+    // Student views his leaves by ID (More Reliable)
+    @GetMapping("/student-id/{id}")
+    public List<LeaveRequest> studentLeavesById(@PathVariable String id) {
+        return service.getLeavesByStudentId(id);
+    }
+
+    // Faculty views leaves by section
+    @GetMapping("/section/{section}")
+    public List<LeaveRequest> sectionLeaves(@PathVariable String section) {
+        return service.getLeavesBySection(section);
     }
 
     // Faculty views all leaves
