@@ -18,6 +18,11 @@ public class User {
     private String role; // STUDENT or FACULTY
     private String section;
 
+    private java.time.LocalDateTime lastLimitResetDate;
+
+    @Transient
+    private boolean isLimitReached;
+
     public Long getId() {
         return id;
     }
@@ -72,5 +77,22 @@ public class User {
 
     public void setSection(String section) {
         this.section = section;
+    }
+
+    public java.time.LocalDateTime getLastLimitResetDate() {
+        return lastLimitResetDate;
+    }
+
+    public void setLastLimitResetDate(java.time.LocalDateTime lastLimitResetDate) {
+        this.lastLimitResetDate = lastLimitResetDate;
+    }
+
+    @com.fasterxml.jackson.annotation.JsonProperty("limitReached")
+    public boolean isLimitReached() {
+        return isLimitReached;
+    }
+
+    public void setLimitReached(boolean limitReached) {
+        isLimitReached = limitReached;
     }
 }

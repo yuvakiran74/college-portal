@@ -23,14 +23,18 @@ public class Attendance {
 
     private LocalDateTime timestamp;
 
+    @Column(columnDefinition = "TEXT")
+    private String livenessImage;
+
     public Attendance() {
         this.timestamp = LocalDateTime.now();
     }
 
-    public Attendance(String userId, LocalDate date, String status) {
+    public Attendance(String userId, LocalDate date, String status, String livenessImage) {
         this.userId = userId;
         this.date = date;
         this.status = status;
+        this.livenessImage = livenessImage;
         this.timestamp = LocalDateTime.now();
     }
 
@@ -73,5 +77,13 @@ public class Attendance {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getLivenessImage() {
+        return livenessImage;
+    }
+
+    public void setLivenessImage(String livenessImage) {
+        this.livenessImage = livenessImage;
     }
 }

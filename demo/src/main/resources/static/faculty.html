@@ -120,10 +120,14 @@
             </div>
             <nav>
                 <ul>
-                    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+                    <li class="active" onclick="showSection('home')"><i class="fas fa-home"></i> Home</li>
+                    <li onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</li>
                     <li onclick="showSection('create')"><i class="fas fa-plus-circle"></i> Create Post</li>
                     <li onclick="showSection('edit')"><i class="fas fa-edit"></i> Edit Post</li>
                     <li onclick="showSection('attendance')"><i class="fas fa-clipboard-list"></i> Attendance</li>
+                    <li onclick="showSection('postAttendance')"><i class="fas fa-user-clock"></i> Post Student
+                        Attendance</li>
+                    <li onclick="showSection('studentList')"><i class="fas fa-users"></i> Student List</li>
                 </ul>
             </nav>
         </aside>
@@ -145,13 +149,33 @@
 
             <div id="content-area">
 
+                <!-- HOME SECTION -->
+                <div id="home" class="section active-section">
+                    <div
+                        style="text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXU-qSU9tfDChNih36yidDV4CUsZsklEVNLQ&s"
+                            alt="Logo" style="height: 100px; margin-bottom: 20px;">
+                        <h1 id="welcomeMessage" style="color: #2c3e50; margin-bottom: 10px; font-size: 2.5rem;">
+                            Welcome</h1>
+                        <p id="welcomeSubtitle" style="color: #7f8c8d; font-size: 1.2rem;">Manage your academic duties
+                            efficiently.</p>
+                        <div style="margin-top: 40px; display: flex; justify-content: center; gap: 20px;">
+                            <button onclick="showSection('dashboard')"
+                                style="padding: 12px 30px; background: var(--primary, #c62828); color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 1rem;">
+                                Go to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ATTENDANCE VIEW -->
                 <div id="attendance" class="section">
                     <div
                         style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;">
 
                         <div>
-                            <h2><i class="fas fa-clipboard-list" style="color: #4facfe;"></i> Student Attendance</h2>
+                            <h2><i class="fas fa-clipboard-list" style="color: #4facfe;"></i> Student Attendance
+                            </h2>
 
                             <!-- Filters -->
                             <div style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
@@ -214,8 +238,86 @@
                     </div>
                 </div>
 
+
+                <!-- POST STUDENT ATTENDANCE VIEW -->
+                <div id="postAttendance" class="section">
+                    <div
+                        style="max-width: 600px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <h2 style="margin-bottom: 30px; color: #6c5ce7; text-align: center;"><i
+                                class="fas fa-user-clock"></i>
+                            Post Student Attendance</h2>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label class="form-label" style="font-weight: 600; color: #555;">Date</label>
+                            <input type="text" id="manualDate" readonly class="form-control-enhanced"
+                                style="background: #f8f9fa; cursor: not-allowed; text-align: center; font-weight: bold; border: 1px solid #eee;">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label class="form-label" style="font-weight: 600; color: #555;">Student Registration
+                                Number</label>
+                            <input type="text" id="manualRegNo" placeholder="Enter Registration Number"
+                                class="form-control-enhanced">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label class="form-label" style="font-weight: 600; color: #555;">Section</label>
+                            <select id="manualSection" class="form-control-enhanced">
+                                <option value="" disabled selected>Select Section</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="C">Section C</option>
+                                <option value="D">Section D</option>
+                            </select>
+                        </div>
+
+                        <button onclick="submitManualAttendance()"
+                            style="width: 100%; padding: 15px; background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);">
+                            Submit Attendance
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STUDENT LIST VIEW -->
+                <div id="studentList" class="section">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;">
+                        <div>
+                            <h2><i class="fas fa-users" style="color: #00cec9;"></i> Student List</h2>
+
+                            <!-- Filters -->
+                            <div style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
+                                <select id="studentSectionSelect" class="form-control-enhanced"
+                                    style="width: auto; padding: 8px;" onchange="loadStudentData()">
+                                    <option value="" disabled selected>Select Section</option>
+                                    <option value="A">Section A</option>
+                                    <option value="B">Section B</option>
+                                    <option value="C">Section C</option>
+                                    <option value="D">Section D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-table-wrapper">
+                        <table class="styled-table" id="studentTable">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Section</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- DASHBOARD SECTION (Default) -->
-                <div id="dashboard" class="section active-section">
+                <div id="dashboard" class="section">
                     <!-- Stats Cards -->
                     <div class="stats-container">
                         <div class="stat-card pending active" onclick="filterData('PENDING', this)">
@@ -265,7 +367,8 @@
                 <div id="create" class="section">
                     <div
                         style="max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-                        <h2 style="margin-bottom: 30px; color: #6c5ce7;"><i class="fas fa-bullhorn"></i> Create New Post
+                        <h2 style="margin-bottom: 30px; color: #6c5ce7;"><i class="fas fa-bullhorn"></i> Create New
+                            Post
                         </h2>
                         <form onsubmit="submitPost(event)">
                             <div class="form-group" style="margin-bottom: 20px;">
@@ -351,6 +454,18 @@
         </main>
     </div>
 
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logoutModal" class="logout-modal-overlay">
+        <div class="logout-modal-box">
+            <h3><i class="fas fa-sign-out-alt" style="color:#ff6b6b;"></i> Confirm Logout</h3>
+            <p>Are you sure you want to end your session?</p>
+            <div class="logout-actions">
+                <button class="btn-stay" onclick="closeLogoutModal()">No, Stay</button>
+                <button class="btn-confirm-logout" onclick="confirmLogout()">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <script>
@@ -374,9 +489,48 @@
                 document.getElementById('dashboard').classList.add('active-section');
             } else if (sectionId === 'create') {
                 document.getElementById('create').classList.add('active-section');
+            } else if (sectionId === 'postAttendance') {
+                // Set today's date automatically
+                const d = new Date();
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0'); //January is 0!
+                const year = d.getFullYear();
+                document.getElementById('manualDate').value = `${year}-${month}-${day}`;
+                document.getElementById('postAttendance').classList.add('active-section');
             } else {
                 document.getElementById(sectionId).classList.add('active-section');
             }
+        }
+
+        // --- MANUAL ATTENDANCE SUBMISSION ---
+        function submitManualAttendance() {
+            const regNo = document.getElementById('manualRegNo').value.trim();
+            const section = document.getElementById('manualSection').value;
+
+            if (!regNo || !section) {
+                alert("Please fill in all fields (Registration Number and Section).");
+                return;
+            }
+
+            fetch("/api/attendance/manual", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: regNo, section: section })
+            })
+                .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                .then(result => {
+                    if (result.status === 200) {
+                        alert("Attendance Posted Successfully for " + regNo);
+                        document.getElementById('manualRegNo').value = '';
+                        document.getElementById('manualSection').value = '';
+                    } else {
+                        alert("Error: " + (result.body.error || "Failed to post attendance"));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Server Error.");
+                });
         }
 
         // --- EXISTING LEAVE REQUEST LOGIC ---
@@ -385,21 +539,45 @@
 
         function loadData() {
             const currentUser = JSON.parse(localStorage.getItem('user'));
-            if (!currentUser || !currentUser.section) {
-                console.error("No section assigned to faculty");
-                // Fallback or alert? For now, fetch generic or empty
-                // fetch("/leave/all") ... No, user requirement says only their section.
-                alert("You are not assigned to a section. Please contact Admin.");
+
+            if (!currentUser) return window.location.href = 'login.html';
+
+            console.log("Loading data for user:", currentUser);
+
+            // HOD Logic: Fetch ALL leaves
+            if (currentUser.role === 'HOD') {
+                console.log("Fetching ALL leaves for HOD");
+                fetch("/leave/all")
+                    .then(res => res.json())
+                    .then(data => {
+                        allRequests = data;
+                        updateCounts();
+                        renderTable();
+                    })
+                    .catch(err => console.error("Error loading HOD data", err));
                 return;
             }
 
+            // Normal Faculty Logic
+            if (!currentUser.section) {
+                console.error("No section assigned to faculty. User object:", currentUser);
+                // If section is missing in localStorage but role is FACULTY, it's a data issue or 'null' string
+                if (currentUser.role === 'FACULTY') {
+                    alert("System Error: Your faculty account is not linked to a section. Please re-login or contact Admin.");
+                }
+                return;
+            }
+
+            console.log("Fetching leaves for Section:", currentUser.section);
             fetch(`/leave/section/${currentUser.section}`)
                 .then(res => res.json())
                 .then(data => {
+                    console.log("Fetched Leaves:", data);
                     allRequests = data;
                     updateCounts();
                     renderTable();
-                });
+                })
+                .catch(err => console.error("Error loading section data", err));
         }
 
         function updateCounts() {
@@ -559,6 +737,15 @@
         }
 
         function logout() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        function confirmLogout() {
+            localStorage.removeItem('user');
             window.location.href = "login.html";
         }
 
@@ -569,7 +756,28 @@
         }
 
         // Initial Load
-        loadData();
+        // loadData(); // Moved to be called but not show section immediately
+
+        // Initialize Home
+        // Initialize Home
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const currentUser = JSON.parse(localStorage.getItem('user'));
+            if (currentUser) {
+                if (currentUser.role === 'HOD') {
+                    document.getElementById('welcomeMessage').innerText = "Welcome HOD";
+                } else {
+                    document.getElementById('welcomeMessage').innerText = "Welcome Faculty";
+                }
+
+                const roleDisplay = currentUser.role === 'HOD' ? 'Head of Department' : 'Faculty Member';
+                const nameDisplay = currentUser.name || 'User';
+
+                document.getElementById('welcomeSubtitle').innerText = "You are logged in as: " + roleDisplay + " (" + nameDisplay + ")";
+                document.querySelector('.user-name').innerText = nameDisplay;
+            }
+            // Load data in background
+            loadData();
+        });
 
         // -----------------------
         // ATTENDANCE LOGIC
@@ -658,11 +866,53 @@
         const originalShowSection = showSection;
         showSection = function (sectionId) {
             originalShowSection(sectionId);
+
             if (sectionId === 'attendance') {
                 // Don't auto load if no section selected, just leave it blank
                 loadAttendanceData();
+            } else if (sectionId === 'studentList') {
+                loadStudentData();
             }
         };
+
+        // -----------------------
+        // STUDENT LIST LOGIC
+        // -----------------------
+        function loadStudentData() {
+            const section = document.getElementById('studentSectionSelect').value;
+            const tbody = document.getElementById('studentTableBody');
+            // If no section selected
+            if (!section) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">Please Select a Section</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+
+            fetch(`/faculty/students?section=${section}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No students found in ${section}.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(student => {
+                        return `
+                        <tr>
+                            <td style="font-weight: bold; color: #555;">${student.userId}</td>
+                            <td>${student.name}</td>
+                            <td>${student.email}</td>
+                            <td><span class="status-badge status-approved">${student.section}</span></td>
+                        </tr>
+                        `;
+                    }).join('');
+                })
+                .catch(err => {
+                    console.error("Error loading students", err);
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Error loading students.</td></tr>`;
+                });
+        }
     </script>
 
 </body>

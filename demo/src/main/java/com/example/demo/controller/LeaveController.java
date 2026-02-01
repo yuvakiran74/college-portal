@@ -82,6 +82,8 @@ public class LeaveController {
 
             service.applyLeave(request);
             return org.springframework.http.ResponseEntity.ok("Application Submitted Successfully");
+        } catch (RuntimeException e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return org.springframework.http.ResponseEntity.status(500).body("Internal Error: " + e.getMessage());

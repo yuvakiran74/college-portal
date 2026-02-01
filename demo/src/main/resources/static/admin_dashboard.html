@@ -408,6 +408,90 @@
                 opacity: 1;
             }
         }
+
+        /* =========================================
+           LOGOUT MODAL STYLES (Blurred Backdrop)
+           ========================================= */
+        .logout-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .logout-modal-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            width: 400px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .logout-modal-box h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .logout-modal-box p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .logout-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-stay {
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: 2px solid #eee;
+            background: white;
+            color: #555;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-stay:hover {
+            background: #f0f2f5;
+            transform: translateY(-2px);
+        }
+
+        .btn-confirm-logout {
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(238, 82, 83, 0.3);
+        }
+
+        .btn-confirm-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(238, 82, 83, 0.4);
+        }
     </style>
 </head>
 
@@ -548,6 +632,8 @@
             </div>
         </div>
 
+
+
         <!-- Maintenance Tab -->
         <div id="maintenance" class="content-section">
             <h2>System Maintenance</h2>
@@ -561,6 +647,31 @@
             <button class="action-btn edit-btn" style="padding: 10px 20px;">Backup Database</button>
         </div>
 
+    </div>
+
+    <!-- Role Selection Modal (For Faculty Tab) -->
+    <div id="roleSelectionModal" class="modal">
+        <div class="modal-content" style="text-align: center; width: 400px;">
+            <h3 style="margin-bottom: 20px;">Select Faculty Type</h3>
+            <p style="margin-bottom: 30px; color: #666;">Is this new user a Head of Department (HOD) or regular
+                Faculty?</p>
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button onclick="proceedWithRole('FACULTY')" class="stat-card"
+                    style="flex-direction: column; padding: 20px; border: 2px solid #eee; width: 140px; justify-content: center; gap: 10px;">
+                    <div class="stat-icon faculty" style="font-size: 2rem; width: 50px; height: 50px;"><i
+                            class="fas fa-chalkboard-teacher"></i></div>
+                    <span style="font-weight: 600; color: #555;">Faculty</span>
+                </button>
+                <button onclick="proceedWithRole('HOD')" class="stat-card"
+                    style="flex-direction: column; padding: 20px; border: 2px solid #eee; width: 140px; justify-content: center; gap: 10px;">
+                    <div class="stat-icon admin" style="font-size: 2rem; width: 50px; height: 50px;"><i
+                            class="fas fa-user-tie"></i></div>
+                    <span style="font-weight: 600; color: #555;">HOD</span>
+                </button>
+            </div>
+            <br>
+            <button class="cancel-btn" onclick="closeModal('roleSelectionModal')">Cancel</button>
+        </div>
     </div>
 
     <!-- Add/Edit User Modal -->
@@ -626,6 +737,18 @@
         </div>
     </div>
 
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logoutModal" class="logout-modal-overlay">
+        <div class="logout-modal-box">
+            <h3><i class="fas fa-sign-out-alt" style="color:#ff6b6b;"></i> Confirm Logout</h3>
+            <p>Are you sure you want to end your session?</p>
+            <div class="logout-actions">
+                <button class="btn-stay" onclick="closeLogoutModal()">No, Stay</button>
+                <button class="btn-confirm-logout" onclick="confirmLogout()">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Check Auth
         const currentUser = JSON.parse(localStorage.getItem('user'));
@@ -638,6 +761,14 @@
         let currentTab = 'dashboard';
 
         function logout() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        function confirmLogout() {
             localStorage.removeItem('user');
             window.location.href = 'login.html';
         }
@@ -646,7 +777,10 @@
             currentTab = tab;
             // Update Sidebar
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            event.target.closest('.nav-link').classList.add('active'); // approximation
+            if (event && event.target) {
+                const link = event.target.closest('.nav-link');
+                if (link) link.classList.add('active');
+            }
 
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(s => {
@@ -682,13 +816,15 @@
             }
         }
 
+
+
         function loadStats() {
             fetch('/admin/users') // Reusing for stats to keep it simple
                 .then(r => r.json())
                 .then(data => {
                     users = data;
                     document.getElementById('count-student').innerText = users.filter(u => u.role === 'STUDENT').length;
-                    document.getElementById('count-faculty').innerText = users.filter(u => u.role === 'FACULTY').length;
+                    document.getElementById('count-faculty').innerText = users.filter(u => u.role === 'FACULTY' || u.role === 'HOD').length;
                     document.getElementById('count-food_admin').innerText = users.filter(u => u.role === 'FOOD_ADMIN').length;
                     document.getElementById('count-admin').innerText = users.filter(u => u.role === 'ADMIN').length;
                 });
@@ -699,6 +835,7 @@
                 .then(r => r.json())
                 .then(data => {
                     users = data;
+                    console.log("Fetched Users:", users);
                     renderTable();
                 });
         }
@@ -720,7 +857,15 @@
 
             const filtered = users.filter(u => {
                 // Role Filter
-                if (!u.role || u.role.toUpperCase().trim() !== roleFilter) return false;
+                // IMPORTANT: Faculty Tab shows both FACULTY and HOD
+                let matchRole = false;
+                if (roleFilter === 'FACULTY') {
+                    matchRole = (u.role === 'FACULTY' || u.role === 'HOD');
+                } else {
+                    matchRole = (u.role === roleFilter);
+                }
+
+                if (!u.role || !matchRole) return false;
 
                 // Search Filter
                 const matchesSearch = (u.name && u.name.toLowerCase().includes(search)) ||
@@ -746,16 +891,22 @@
             }
 
             filtered.forEach(u => {
+                let resetBtn = '';
+                if (u.limitReached) {
+                    resetBtn = `<button class="action-btn" style="background: #e17055; color: white;" onclick="resetLimits(${u.id})"><i class="fas fa-undo"></i> Reset</button>`;
+                }
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${u.userId}</td>
-                    <td>${u.name}</td>
+                    <td>${u.name} ${u.role === 'HOD' ? '<span style="font-size:0.8em; background:#333; color:white; padding:2px 5px; border-radius:4px;">HOD</span>' : ''}</td>
                     <td>${u.role === 'STUDENT' ? (u.section || '-') : (u.email || '-')}</td>
                     <td>${u.password}</td>
                     <td>
                         <button class="action-btn edit-btn" onclick="openEditModal(${u.id})"><i class="fas fa-edit"></i> Edit</button>
                         <button class="action-btn pass-btn" onclick="openPassModal(${u.id})"><i class="fas fa-key"></i> Password</button>
                         <button class="action-btn del-btn" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i></button>
+                        ${resetBtn}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -766,9 +917,22 @@
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openUserModal() {
+            // Check if we are in Faculty tab
+            const currentTabRole = currentTab.toUpperCase();
+            if (currentTabRole === 'FACULTY') {
+                // Show intermediate selection
+                document.getElementById('roleSelectionModal').style.display = 'flex';
+                return;
+            }
+
+            // Otherwise proceed as normal
+            proceedWithRole(currentTabRole);
+        }
+
+        function proceedWithRole(role) {
+            closeModal('roleSelectionModal');
             document.getElementById('editId').value = '';
-            const role = currentTab.toUpperCase();
-            document.getElementById('editRole').value = role;
+            document.getElementById('editRole').value = role; // Set the specific role (FACULTY or HOD or others)
             document.getElementById('editUserId').value = '';
             document.getElementById('editName').value = '';
             document.getElementById('editEmail').value = '';
@@ -777,7 +941,8 @@
             document.getElementById('passwordGroup').style.display = 'block';
             document.getElementById('editUserId').readOnly = false;
 
-            // Show Section for Students/Faculty
+            // Show Section only for Student and regular Faculty
+            // HOD does not need section
             if (role === 'STUDENT' || role === 'FACULTY') {
                 document.getElementById('sectionGroup').style.display = 'block';
             } else {
@@ -881,6 +1046,22 @@
 
         // Init
         loadStats();
+        function resetLimits(id) {
+            if (!confirm("Confirm reset leaves/outpasses for this month?")) return;
+            fetch('/admin/reset-limits', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: String(id) })
+            })
+                .then(async r => {
+                    if (r.ok) {
+                        alert("Limits reset successfully");
+                        fetchUsers();
+                    } else {
+                        alert("Failed: " + await r.text());
+                    }
+                });
+        }
     </script>
 </body>
 

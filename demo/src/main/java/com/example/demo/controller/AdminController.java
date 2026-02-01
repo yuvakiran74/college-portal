@@ -14,16 +14,21 @@ import java.util.Optional;
 public class AdminController {
 
     private final UserRepository repo;
+    private final com.example.demo.service.LeaveService leaveService;
 
-    public AdminController(UserRepository repo) {
+    public AdminController(UserRepository repo, com.example.demo.service.LeaveService leaveService) {
         this.repo = repo;
+        this.leaveService = leaveService;
     }
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
         List<User> users = repo.findAll();
-        System.out.println("Admin fetching users: " + users.size());
-        users.forEach(u -> System.out.println("Found: " + u.getUserId() + " Role: " + u.getRole()));
+        users.forEach(u -> {
+            if ("STUDENT".equalsIgnoreCase(u.getRole())) {
+                leaveService.computeLimitStatus(u);
+            }
+        });
         return users;
     }
 
@@ -58,6 +63,23 @@ public class AdminController {
             u.setPassword(user.getPassword());
             repo.save(u);
             return ResponseEntity.ok("Password updated");
+        }
+        return ResponseEntity.badRequest().body("User not found");
+    }
+
+    @PostMapping("/reset-limits")
+    public ResponseEntity<?> resetLimits(@RequestBody java.util.Map<String, String> payload) {
+        String idStr = payload.get("id");
+        if (idStr == null)
+            return ResponseEntity.badRequest().body("ID required");
+
+        Long id = Long.parseLong(idStr);
+        Optional<User> existing = repo.findById(id);
+        if (existing.isPresent()) {
+            User u = existing.get();
+            u.setLastLimitResetDate(java.time.LocalDateTime.now());
+            repo.save(u);
+            return ResponseEntity.ok("Limits reset successfully");
         }
         return ResponseEntity.badRequest().body("User not found");
     }

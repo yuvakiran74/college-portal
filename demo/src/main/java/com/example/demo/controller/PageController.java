@@ -25,4 +25,14 @@ public class PageController {
     public String registerPage() {
         return "redirect:/login.html";
     }
+
+    @GetMapping("/")
+    public String rootPage() {
+        return "redirect:/login.html";
+    }
+
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "redirect:/admin_dashboard.html";
+    }
 }

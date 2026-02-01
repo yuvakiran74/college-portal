@@ -11,5 +11,6 @@ public interface LeaveRepository extends JpaRepository<LeaveRequest, Long> {
 
     List<LeaveRequest> findByStudentId(String studentId);
 
-    List<LeaveRequest> findBySection(String section);
+    @org.springframework.data.jpa.repository.Query("SELECT l FROM LeaveRequest l, User u WHERE LOWER(TRIM(l.studentId)) = LOWER(TRIM(u.userId)) AND LOWER(TRIM(u.section)) = LOWER(TRIM(:section))")
+    List<LeaveRequest> findBySection(@org.springframework.data.repository.query.Param("section") String section);
 }

@@ -21,9 +21,10 @@ public class AttendanceController {
         String userId = (String) payload.get("userId");
         Double lat = Double.valueOf(payload.get("latitude").toString());
         Double lng = Double.valueOf(payload.get("longitude").toString());
+        String livenessImage = (String) payload.get("livenessImage");
 
         try {
-            Attendance attendance = attendanceService.markAttendance(userId, lat, lng);
+            Attendance attendance = attendanceService.markAttendance(userId, lat, lng, livenessImage);
             return ResponseEntity.ok(attendance);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -130,5 +131,17 @@ public class AttendanceController {
                         "attachment; filename=\"" + filename + "\"")
                 .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "text/csv")
                 .body(csvContent);
+    }
+
+    @PostMapping("/manual")
+    public ResponseEntity<?> manualAttendance(@RequestBody Map<String, String> payload) {
+        String userId = payload.get("userId");
+        String section = payload.get("section");
+        try {
+            Attendance a = attendanceService.manualMarkAttendance(userId, section);
+            return ResponseEntity.ok(a);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

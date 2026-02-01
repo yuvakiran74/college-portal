@@ -15,7 +15,7 @@ public class AttendanceService {
     @Autowired
     private AttendanceRepository attendanceRepository;
 
-    public Attendance markAttendance(String userId, double lat, double lng) {
+    public Attendance markAttendance(String userId, double lat, double lng, String livenessImage) {
         // Simple Geolocation Logic (Mocked for now as per "analyse location"
         // requirement which usually needs frontend coordinates)
         // In a real app, we would check if lat/lng validation is within campus bounds.
@@ -27,7 +27,7 @@ public class AttendanceService {
             throw new RuntimeException("Attendance already marked for today.");
         }
 
-        Attendance attendance = new Attendance(userId, today, "PRESENT");
+        Attendance attendance = new Attendance(userId, today, "PRESENT", livenessImage);
         return attendanceRepository.save(attendance);
     }
 
@@ -113,5 +113,36 @@ public class AttendanceService {
                     .append(a.getStatus()).append("\n");
         }
         return csv.toString();
+    }
+
+    public Attendance manualMarkAttendance(String userId, String section) {
+        com.example.demo.entity.User student = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + userId));
+
+        if (!"STUDENT".equalsIgnoreCase(student.getRole())) {
+            throw new RuntimeException("User is not a student.");
+        }
+
+        if (section != null && !section.equalsIgnoreCase(student.getSection())) {
+            throw new RuntimeException("Student does not belong to section " + section);
+        }
+
+        LocalDate today = LocalDate.now();
+        Optional<Attendance> existing = attendanceRepository.findByUserIdAndDate(userId, today);
+        if (existing.isPresent()) {
+            // Requirement says: "if student has got any server issues... student can go to
+            // faculty directly... and post attendance"
+            // If it's already marked absent? Or check logic.
+            // Usually if they are here, it's because they aren't marked present.
+            // If they are already marked Present, we can say "Already Present".
+            // If they are marked Absent (if we had that), we should update.
+            // But current system only seems to mark PRESENT. There is no ABSENT record
+            // creation explicitly visible yet (unless cron job).
+            // Assuming we only store positive attendance.
+            throw new RuntimeException("Attendance already marked for today.");
+        }
+
+        Attendance attendance = new Attendance(userId, today, "PRESENT", "MANUAL_OVERRIDE");
+        return attendanceRepository.save(attendance);
     }
 }

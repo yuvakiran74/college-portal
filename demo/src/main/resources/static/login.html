@@ -14,8 +14,8 @@
         <header class="landi-header">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXU-qSU9tfDChNih36yidDV4CUsZsklEVNLQ&s"
                 alt="Lendi Logo" class="landi-logo">
-            <!-- Optional: Link back to main site or simple nav -->
-            <div style="font-weight: 500; color: #555;">Student & Faculty Portal</div>
+            <!-- Header Admin Button -->
+            <button class="header-admin-btn" onclick="openAdminModal()">Admins Login</button>
         </header>
 
         <!-- HERO IMAGE: Rectangle Banner -->
@@ -59,21 +59,34 @@
             <p id="modalSubtitle">Please select your role to continue</p>
 
             <!-- Step 1: Role Selection -->
-            <div id="roleSelection" class="role-buttons">
-                <button class="role-btn student" onclick="showLoginForm('STUDENT')">
-                    <i class="fas fa-user-graduate"></i><br>Student
-                </button>
-                <button class="role-btn faculty" onclick="showLoginForm('FACULTY')">
-                    <i class="fas fa-chalkboard-teacher"></i><br>Faculty
-                </button>
-                <button class="role-btn admin" onclick="showLoginForm('FOOD_ADMIN')"
-                    style="background: #e0f2f1; color: #00695c;">
-                    <i class="fas fa-utensils"></i><br>Food Admin
-                </button>
-                <button class="role-btn admin-main" onclick="showLoginForm('ADMIN')"
-                    style="background: #ffebee; color: #c62828;">
-                    <i class="fas fa-user-shield"></i><br>Admin
-                </button>
+            <div id="roleSelection" class="role-selection-container">
+
+                <!-- Centered Student Login -->
+                <div id="studentRoleWrapper" class="student-role-wrapper">
+                    <button class="role-btn student-main" onclick="showLoginForm('STUDENT')">
+                        <i class="fas fa-user-graduate" style="font-size: 2.5rem;"></i>
+                        <span>Student Login</span>
+                    </button>
+                </div>
+
+                <!-- Hidden Admin Logins -->
+                <div id="adminRolesWrapper" class="admin-roles-wrapper">
+                    <p style="font-size: 0.9rem; margin-bottom: 15px; color: #888;">Administrative Access</p>
+                    <div class="admin-roles-grid">
+                        <button class="role-btn faculty" onclick="showLoginForm('FACULTY')">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Faculty</span>
+                        </button>
+                        <button class="role-btn admin" onclick="showLoginForm('FOOD_ADMIN')">
+                            <i class="fas fa-utensils"></i>
+                            <span>Canteen</span>
+                        </button>
+                        <button class="role-btn admin-main" onclick="showLoginForm('ADMIN')">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Admin</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Step 2: Login Form -->
@@ -113,15 +126,21 @@
 
     <script>
         let selectedRole = "";
+        let currentMode = "STUDENT"; // 'STUDENT' or 'ADMIN'
 
         // Clear any previous session on load
         localStorage.removeItem("user");
 
-        // Unused authToggle removed as new UI uses direct buttons
-
         function openLoginModal() {
+            currentMode = "STUDENT";
             document.getElementById('loginModal').style.display = 'flex';
-            backToRoles(); // Reset to role selection state
+            backToRoles();
+        }
+
+        function openAdminModal() {
+            currentMode = "ADMIN";
+            document.getElementById('loginModal').style.display = 'flex';
+            backToRoles();
         }
 
         function closeLoginModal() {
@@ -139,11 +158,9 @@
             let title = 'Login';
             if (role === 'STUDENT') title = 'Student Login';
             else if (role === 'FACULTY') title = 'Faculty Login';
-            else if (role === 'FACULTY') title = 'Faculty Login';
             else if (role === 'FOOD_ADMIN') title = 'Canteen Admin Login';
             else title = 'System Admin Login';
 
-            document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalSubtitle').innerText = 'Enter your credentials';
 
@@ -162,6 +179,15 @@
             document.getElementById('modalTitle').innerText = 'Welcome Back';
             document.getElementById('modalSubtitle').innerText = 'Please select your role to continue';
             document.getElementById('msg').innerText = "";
+
+            // Toggle views based on mode
+            if (currentMode === "STUDENT") {
+                document.getElementById('studentRoleWrapper').style.display = 'flex';
+                document.getElementById('adminRolesWrapper').style.display = 'none';
+            } else {
+                document.getElementById('studentRoleWrapper').style.display = 'none';
+                document.getElementById('adminRolesWrapper').style.display = 'block';
+            }
         }
 
         function login() {
@@ -196,7 +222,12 @@
                     }
 
                     // Implicit Role Check (Optional but good for ux)
-                    if (user.role !== selectedRole) {
+                    // HODs use Faculty Login
+                    let valid = false;
+                    if (user.role === selectedRole) valid = true;
+                    if (selectedRole === 'FACULTY' && user.role === 'HOD') valid = true;
+
+                    if (!valid) {
                         msg.innerText = "This User ID does not belong to " + selectedRole;
                         return;
                     }
@@ -214,7 +245,7 @@
                             return;
                         }
                         window.location.href = "/student.html";
-                    } else if (user.role === "FACULTY") {
+                    } else if (user.role === "FACULTY" || user.role === "HOD") {
                         window.location.href = "/faculty.html";
                     } else if (user.role === "FOOD_ADMIN") {
                         window.location.href = "/food_admin.html";
