@@ -108,6 +108,18 @@ public class LeaveController {
         return service.getLeavesBySection(section);
     }
 
+    // Faculty views leaves by section, branch, year
+    @GetMapping("/faculty-filter")
+    public List<LeaveRequest> facultyLeaves(
+            @RequestParam String section,
+            @RequestParam(required = false) String branch,
+            @RequestParam(required = false) String year) {
+        if (branch != null && !branch.isEmpty() && year != null && !year.isEmpty()) {
+            return service.getLeavesByFacultyCriteria(section, branch, year);
+        }
+        return service.getLeavesBySection(section);
+    }
+
     // Faculty views all leaves
     @GetMapping("/all")
     public List<LeaveRequest> allLeaves() {

@@ -121,6 +121,10 @@ public class LeaveService {
         return repo.findBySection(section);
     }
 
+    public List<LeaveRequest> getLeavesByFacultyCriteria(String section, String branch, String year) {
+        return repo.findByFacultyCriteria(section, branch, year);
+    }
+
     public List<LeaveRequest> getAllLeaves() {
         return repo.findAll();
     }

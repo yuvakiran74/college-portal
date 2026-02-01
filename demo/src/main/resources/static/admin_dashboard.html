@@ -691,6 +691,30 @@
                     <input type="text" id="editName" class="form-input" required>
                 </div>
 
+                <div class="form-group" id="branchGroup" style="display: none;">
+                    <label>Branch *</label>
+                    <select id="editBranch" class="form-input">
+                        <option value="" disabled selected>Select Branch</option>
+                        <option value="CSE">CSE</option>
+                        <option value="ECE">ECE</option>
+                        <option value="EEE">EEE</option>
+                        <option value="MECH">MECH</option>
+                        <option value="CIVIL">CIVIL</option>
+                        <option value="CSSE">CSSE</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="yearGroup" style="display: none;">
+                    <label>Year *</label>
+                    <select id="editYear" class="form-input">
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+
                 <div class="form-group" id="sectionGroup" style="display: none;">
                     <label>Section *</label>
                     <select id="editSection" class="form-input">
@@ -938,15 +962,21 @@
             document.getElementById('editEmail').value = '';
             document.getElementById('editPassword').value = '';
             document.getElementById('editSection').value = '';
+            document.getElementById('editBranch').value = '';
+            document.getElementById('editYear').value = '';
             document.getElementById('passwordGroup').style.display = 'block';
             document.getElementById('editUserId').readOnly = false;
 
-            // Show Section only for Student and regular Faculty
+            // Show Section/Branch/Year only for Student and regular Faculty
             // HOD does not need section
             if (role === 'STUDENT' || role === 'FACULTY') {
                 document.getElementById('sectionGroup').style.display = 'block';
+                document.getElementById('branchGroup').style.display = 'block';
+                document.getElementById('yearGroup').style.display = 'block';
             } else {
                 document.getElementById('sectionGroup').style.display = 'none';
+                document.getElementById('branchGroup').style.display = 'none';
+                document.getElementById('yearGroup').style.display = 'none';
             }
 
             document.getElementById('userModal').style.display = 'flex';
@@ -961,16 +991,22 @@
             document.getElementById('editName').value = user.name;
             document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editSection').value = user.section || '';
+            document.getElementById('editBranch').value = user.branch || '';
+            document.getElementById('editYear').value = user.year || '';
 
             // Allow password edit in main modal
             document.getElementById('passwordGroup').style.display = 'block';
             document.getElementById('editPassword').value = user.password; // Show current password
 
-            // Show Section for Students/Faculty
+            // Show Section/Branch/Year for Students/Faculty
             if (user.role === 'STUDENT' || user.role === 'FACULTY') {
                 document.getElementById('sectionGroup').style.display = 'block';
+                document.getElementById('branchGroup').style.display = 'block';
+                document.getElementById('yearGroup').style.display = 'block';
             } else {
                 document.getElementById('sectionGroup').style.display = 'none';
+                document.getElementById('branchGroup').style.display = 'none';
+                document.getElementById('yearGroup').style.display = 'none';
             }
 
             document.getElementById('userModal').style.display = 'flex';
@@ -992,7 +1028,10 @@
                 name: document.getElementById('editName').value,
                 email: document.getElementById('editEmail').value,
                 role: role,
+                role: role,
                 section: (role === 'STUDENT' || role === 'FACULTY') ? document.getElementById('editSection').value : null,
+                branch: (role === 'STUDENT' || role === 'FACULTY') ? document.getElementById('editBranch').value : null,
+                year: (role === 'STUDENT' || role === 'FACULTY') ? document.getElementById('editYear').value : null,
                 password: document.getElementById('editPassword').value
             };
 

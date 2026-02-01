@@ -17,6 +17,8 @@ public class User {
     private String password;
     private String role; // STUDENT or FACULTY
     private String section;
+    private String branch;
+    private String year;
 
     private java.time.LocalDateTime lastLimitResetDate;
 

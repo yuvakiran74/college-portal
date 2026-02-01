@@ -569,7 +569,14 @@
             }
 
             console.log("Fetching leaves for Section:", currentUser.section);
-            fetch(`/leave/section/${currentUser.section}`)
+
+            let url = `/leave/section/${currentUser.section}`;
+            if (currentUser.branch && currentUser.year) {
+                console.log("Using Advanced Filter: Branch=" + currentUser.branch + " Year=" + currentUser.year);
+                url = `/leave/faculty-filter?section=${currentUser.section}&branch=${encodeURIComponent(currentUser.branch)}&year=${encodeURIComponent(currentUser.year)}`;
+            }
+
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     console.log("Fetched Leaves:", data);
