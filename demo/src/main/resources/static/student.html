@@ -10,6 +10,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
 </head>
 
 <body>
@@ -56,7 +57,7 @@
                 <div id="home" class="section active-section">
                     <div class="card-glass"
                         style="text-align: center; padding: 40px; max-width: 800px; margin: 0 auto;">
-                        <h1 style="color: #6c5ce7; margin-bottom: 20px;">Welcome to Student Portal</h1>
+                        <h1 style="color: #6c5ce7; margin-bottom: 20px;" id="welcomeHomeText">Welcome to Student Portal</h1>
                         <p style="color: #666; font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px;">
                             Your one-stop destination for all campus activities. Here you can apply for leaves,
                             book food from the canteen, check your attendance, and keep up with campus updates.
@@ -383,7 +384,9 @@
                     <div>
                         <h3 style="margin: 0; color: #333; font-size: 1.2rem;">Hello, <span
                                 id="profileName">Student</span></h3>
-                        <p style="margin: 5px 0 0; color: #777;">Student ID: <strong id="profileId"
+                        <p style="margin: 5px 0 0; color: #777;">Roll No: <strong id="profileId"
+                                style="color: #4facfe;">-</strong></p>
+                        <p style="margin: 5px 0 0; color: #777;">Email: <strong id="profileEmail"
                                 style="color: #4facfe;">-</strong></p>
                     </div>
                 </div>
@@ -489,8 +492,30 @@
 
             <!-- SETTINGS SECTION -->
             <div id="settings" class="section">
-                <h2>Settings</h2>
-                <p>Profile settings functionality coming soon...</p>
+                <center><h2 style="margin-bottom: 20px;"><i class="fas fa-cog" style="color: #6c5ce7;"></i> Settings</h2></center>
+                
+                <div class="card-glass" style="max-width: 500px; margin: 0 auto; padding: 40px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 25px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <i class="fas fa-key" style="color: #4facfe;"></i> Change Password
+                    </h3>
+                    
+                    <form id="changePasswordForm" onsubmit="event.preventDefault(); updatePassword();">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control-enhanced" placeholder="Enter current password" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label class="form-label">New Password</label>
+                            <input type="password" id="newPassword" class="form-control-enhanced" placeholder="Enter new password" required>
+                        </div>
+                        <div class="form-group" style="text-align: center;">
+                            <button type="submit" class="submit-btn-centered" style="width: 100%;">
+                                <i class="fas fa-sync-alt"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
+                    <p id="passwordMsg" style="text-align: center; margin-top: 15px; font-weight: 500; font-size: 1rem;"></p>
+                </div>
             </div>
 
             <!-- Global Footer -->
@@ -556,12 +581,50 @@
         // Profile Section Display
         document.getElementById("profileName").innerText = user.name || "Student Name";
         document.getElementById("profileId").innerText = user.userId || "ID Not Found";
+        document.getElementById("profileEmail").innerText = user.email || "Email Not Provided";
         document.getElementById("profileAvatar").innerText = initial;
+
+        // Welcome Home Text
+        const welcomeEl = document.getElementById("welcomeHomeText");
+        if(welcomeEl) welcomeEl.innerText = `Welcome ${user.name || "Student"}`;
 
         // Default load
         loadLeaves();
         loadFoodOrders();
         loadCampusPosts();
+
+        // -----------------------
+        // SETTINGS LOGIC
+        // -----------------------
+        function updatePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const msg = document.getElementById('passwordMsg');
+
+            msg.innerText = "Updating... Please wait";
+            msg.style.color = "#4facfe";
+
+            fetch('/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.userId, currentPassword: current, newPassword: newPass })
+            })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text);
+                return JSON.parse(text);
+            })
+            .then(updatedUser => {
+                msg.innerHTML = '<i class="fas fa-check-circle"></i> Password updated successfully!';
+                msg.style.color = "#2ed573";
+                document.getElementById('changePasswordForm').reset();
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+            })
+            .catch(err => {
+                msg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + err.message;
+                msg.style.color = "#d63031";
+            });
+        }
 
         // -----------------------
         // CAMPUS EXPLORE LOGIC

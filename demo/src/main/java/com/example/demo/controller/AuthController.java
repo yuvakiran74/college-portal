@@ -4,6 +4,8 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,5 +46,26 @@ public class AuthController {
         return repo.findByUserIdAndPassword(
                 user.getUserId(),
                 user.getPassword()).orElse(null);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
+        String userId = payload.get("userId");
+        String currentPassword = payload.get("currentPassword");
+        String newPassword = payload.get("newPassword");
+
+        if (userId == null || currentPassword == null || newPassword == null) {
+            return ResponseEntity.badRequest().body("Missing required parameters.");
+        }
+
+        Optional<User> userOpt = repo.findByUserIdAndPassword(userId, currentPassword);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(newPassword);
+            repo.save(user);
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.badRequest().body("Incorrect current password.");
+        }
     }
 }

@@ -108,6 +108,7 @@
             color: white;
         }
     </style>
+    <script src="loader.js"></script>
 </head>
 
 <body>
@@ -157,8 +158,24 @@
                             alt="Logo" style="height: 100px; margin-bottom: 20px;">
                         <h1 id="welcomeMessage" style="color: #2c3e50; margin-bottom: 10px; font-size: 2.5rem;">
                             Welcome</h1>
-                        <p id="welcomeSubtitle" style="color: #7f8c8d; font-size: 1.2rem;">Manage your academic duties
+                        <p id="welcomeSubtitle" style="color: #7f8c8d; font-size: 1.2rem; margin-bottom: 30px;">Manage
+                            your academic duties
                             efficiently.</p>
+
+                        <!-- Added Faculty Details -->
+                        <div
+                            style="display: inline-block; text-align: left; background: #f8f9fa; padding: 20px 40px; border-radius: 15px; border-left: 5px solid #c62828;">
+                            <h3 style="margin-top: 0; color: #c62828; margin-bottom: 15px;">Faculty Profile</h3>
+                            <p style="margin: 5px 0; font-size: 1.1rem; color: #444;"><strong>Name:</strong> <span
+                                    id="displayFacultyName">Loading...</span></p>
+                            <p style="margin: 5px 0; font-size: 1.1rem; color: #444;"><strong>Branch:</strong> <span
+                                    id="displayBranch">Loading...</span></p>
+                            <p style="margin: 5px 0; font-size: 1.1rem; color: #444;"><strong>Year:</strong> <span
+                                    id="displayYear">Loading...</span></p>
+                            <p style="margin: 5px 0; font-size: 1.1rem; color: #444;"><strong>Section:</strong> <span
+                                    id="displaySection">Loading...</span></p>
+                        </div>
+
                         <div style="margin-top: 40px; display: flex; justify-content: center; gap: 20px;">
                             <button onclick="showSection('dashboard')"
                                 style="padding: 12px 30px; background: var(--primary, #c62828); color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 1rem;">
@@ -766,7 +783,6 @@
         // loadData(); // Moved to be called but not show section immediately
 
         // Initialize Home
-        // Initialize Home
         window.addEventListener('DOMContentLoaded', (event) => {
             const currentUser = JSON.parse(localStorage.getItem('user'));
             if (currentUser) {
@@ -781,6 +797,12 @@
 
                 document.getElementById('welcomeSubtitle').innerText = "You are logged in as: " + roleDisplay + " (" + nameDisplay + ")";
                 document.querySelector('.user-name').innerText = nameDisplay;
+
+                // --- NEW populate fields ---
+                document.getElementById('displayFacultyName').innerText = currentUser.name || "N/A";
+                document.getElementById('displayBranch').innerText = currentUser.branch || "N/A";
+                document.getElementById('displayYear').innerText = currentUser.year || "N/A";
+                document.getElementById('displaySection').innerText = currentUser.section || "N/A";
             }
             // Load data in background
             loadData();

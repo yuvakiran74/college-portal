@@ -97,4 +97,20 @@ public class User {
     public void setLimitReached(boolean limitReached) {
         isLimitReached = limitReached;
     }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
 }
