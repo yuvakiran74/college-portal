@@ -1,1 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <title>College Portal - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Unique Loading Animation Overlay -->
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; backdrop-filter: blur(8px);">
+        <div class="unique-loader">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+            <div class="circle circle-4"></div>
+        </div>
+        <h3 style="margin-top: 30px; font-size: 24px; font-weight: 300; letter-spacing: 3px; animation: textPulse 1.5s ease-in-out infinite;">Authenticating...</h3>
+    </div>
+    <style>
+        .unique-loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            animation: containerSpin 2s linear infinite;
+        }
+        .unique-loader .circle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #4facfe;
+            animation: circleScale 2s ease-in-out infinite;
+        }
+        .unique-loader .circle-1 { top: 0; left: 0; background-color: #00f2fe; }
+        .unique-loader .circle-2 { top: 0; right: 0; background-color: #4facfe; animation-delay: -0.5s; }
+        .unique-loader .circle-3 { bottom: 0; right: 0; background-color: #00f2fe; animation-delay: -1s; }
+        .unique-loader .circle-4 { bottom: 0; left: 0; background-color: #4facfe; animation-delay: -1.5s; }
+
+        @keyframes containerSpin {
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes circleScale {
+            0%, 100% { transform: scale(0.5); opacity: 0.5; }
+            50% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes textPulse {
+            0% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.5; transform: scale(0.95); }
+        }
+    </style>
+
+    <div class="landing-page">
+        <!-- HEADER: Logo -->
+        <header class="landi-header">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXU-qSU9tfDChNih36yidDV4CUsZsklEVNLQ&s"
+                alt="Lendi Logo" class="landi-logo">
+            <!-- Header Admin Button -->
+            <button class="header-admin-btn" onclick="openAdminModal()">Admins Login</button>
+        </header>
+
+        <!-- HERO IMAGE: Rectangle Banner -->
+        <div class="hero-banner-wrapper">
+            <img src="https://www.lendi.edu.in/cloud/lendi-institute.jpg" alt="Lendi Institute" class="hero-banner">
+        </div>
+
+        <!-- CONTENT SECTION: Scrollable -->
+        <div class="landing-content">
+            <h1>Empower Your Future</h1>
+            <p>
+                Welcome to the digital campus of Lendi Institute of Engineering and Technology.
+                Access your dashboard, apply for leaves/outpasses, and stay connected with your faculty seamlessly.
+            </p>
+
+            <div class="landing-actions">
+                <button class="btn-land btn-login" onclick="openLoginModal()">Login to Portal</button>
+            </div>
+
+            <!-- Scrollable Content Demo -->
+            <div class="scroll-indicator">
+                <i class="fas fa-chevron-down"></i>
+                <p>Scroll for more info</p>
+            </div>
+
+            <br><br><br>
+
+            <!-- Additional Info (Placeholder) -->
+            <h3>About the Portal</h3>
+            <p>This portal is designed to streamline academic requests and approvals. Students can track their
+                application status in real-time, while faculty can manage approvals efficiently from anywhere.</p>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL (Existing Logic) -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+
+            <h2 id="modalTitle">Welcome Back</h2>
+            <p id="modalSubtitle">Please select your role to continue</p>
+
+            <!-- Step 1: Role Selection -->
+            <div id="roleSelection" class="role-selection-container">
+
+                <!-- Centered Student Login -->
+                <div id="studentRoleWrapper" class="student-role-wrapper">
+                    <button class="role-btn student-main" onclick="showLoginForm('STUDENT')">
+                        <i class="fas fa-user-graduate" style="font-size: 2.5rem;"></i>
+                        <span>Student Login</span>
+                    </button>
+                </div>
+
+                <!-- Hidden Admin Logins -->
+                <div id="adminRolesWrapper" class="admin-roles-wrapper">
+                    <p style="font-size: 0.9rem; margin-bottom: 15px; color: #888;">Administrative Access</p>
+                    <div class="admin-roles-grid">
+                        <button class="role-btn faculty" onclick="showLoginForm('FACULTY')">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Faculty</span>
+                        </button>
+                        <button class="role-btn admin" onclick="showLoginForm('FOOD_ADMIN')">
+                            <i class="fas fa-utensils"></i>
+                            <span>Canteen</span>
+                        </button>
+                        <button class="role-btn admin-main" onclick="showLoginForm('ADMIN')">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Admin</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Login Form -->
+            <div id="loginForm" class="login-form">
+                <form onsubmit="event.preventDefault(); login()" autocomplete="off">
+                    <div class="input-group">
+                        <label>User ID</label>
+                        <input type="text" id="userid" class="input-field" placeholder="Enter User ID" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="password" class="input-field" placeholder="Enter Password" required>
+                    </div>
+
+                    <div class="input-group" id="loginSectionGroup" style="display: none;">
+                        <label>Section</label>
+                        <select id="loginSection" class="input-field">
+                            <option value="" disabled selected>Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
+
+                    <p id="msg" style="color: red; font-size: 14px; margin-bottom: 10px;"></p>
+
+                    <button class="primary-btn">Login</button>
+                </form>
+                <p style="margin-top: 15px; font-size: 13px; color: #777; cursor: pointer;" onclick="backToRoles()">
+                    <i class="fas fa-arrow-left"></i> Back to Role Selection
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRole = "";
+        let currentMode = "STUDENT"; // 'STUDENT' or 'ADMIN'
+
+        // Clear any previous session on load
+        localStorage.removeItem("user");
+
+        function openLoginModal() {
+            currentMode = "STUDENT";
+            document.getElementById('loginModal').style.display = 'flex';
+            backToRoles();
+        }
+
+        function openAdminModal() {
+            currentMode = "ADMIN";
+            document.getElementById('loginModal').style.display = 'flex';
+            backToRoles();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('userid').value = "";
+            document.getElementById('password').value = "";
+            document.getElementById('msg').innerText = "";
+        }
+
+        function showLoginForm(role) {
+            selectedRole = role;
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+
+            let title = 'Login';
+            if (role === 'STUDENT') title = 'Student Login';
+            else if (role === 'FACULTY') title = 'Faculty Login';
+            else if (role === 'FOOD_ADMIN') title = 'Canteen Admin Login';
+            else title = 'System Admin Login';
+
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalSubtitle').innerText = 'Enter your credentials';
+
+            // Show Section only for Student
+            if (role === 'STUDENT') {
+                document.getElementById('loginSectionGroup').style.display = 'block';
+            } else {
+                document.getElementById('loginSectionGroup').style.display = 'none';
+            }
+        }
+
+        function backToRoles() {
+            selectedRole = "";
+            document.getElementById('roleSelection').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('modalTitle').innerText = 'Welcome Back';
+            document.getElementById('modalSubtitle').innerText = 'Please select your role to continue';
+            document.getElementById('msg').innerText = "";
+
+            // Toggle views based on mode
+            if (currentMode === "STUDENT") {
+                document.getElementById('studentRoleWrapper').style.display = 'flex';
+                document.getElementById('adminRolesWrapper').style.display = 'none';
+            } else {
+                document.getElementById('studentRoleWrapper').style.display = 'none';
+                document.getElementById('adminRolesWrapper').style.display = 'block';
+            }
+        }
+
+        function login() {
+            const userId = document.getElementById("userid").value;
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("msg");
+
+            msg.innerText = "";
+
+            if (!userId || !password) {
+                msg.innerText = "Please enter User ID and Password";
+                return;
+            }
+
+            // Show loading animation overlay
+            document.getElementById("loadingOverlay").style.display = "flex";
+
+            // Server-side authentication for all roles
+            fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId: userId,
+                    password: password
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Invalid login");
+                    return response.json();
+                })
+                .then(user => {
+                    if (!user) {
+                        document.getElementById("loadingOverlay").style.display = "none";
+                        msg.innerText = "Invalid credentials";
+                        return;
+                    }
+
+                    // Implicit Role Check (Optional but good for ux)
+                    // HODs use Faculty Login
+                    let valid = false;
+                    if (user.role === selectedRole) valid = true;
+                    if (selectedRole === 'FACULTY' && user.role === 'HOD') valid = true;
+
+                    if (!valid) {
+                        document.getElementById("loadingOverlay").style.display = "none";
+                        msg.innerText = "This User ID does not belong to " + selectedRole;
+                        return;
+                    }
+
+                    localStorage.setItem("user", JSON.stringify(user));
+
+                    if (user.role === "STUDENT") {
+                        const selectedSection = document.getElementById("loginSection").value;
+                        if (!selectedSection) {
+                            document.getElementById("loadingOverlay").style.display = "none";
+                            msg.innerText = "Please select your section";
+                            return;
+                        }
+                        if (user.section && user.section !== selectedSection) {
+                            document.getElementById("loadingOverlay").style.display = "none";
+                            msg.innerText = "Incorrect section selected";
+                            return;
+                        }
+                        window.location.href = "/student.html";
+                    } else if (user.role === "FACULTY" || user.role === "HOD") {
+                        window.location.href = "/faculty.html";
+                    } else if (user.role === "FOOD_ADMIN") {
+                        window.location.href = "/food_admin.html";
+                    } else if (user.role === "ADMIN") {
+                        window.location.href = "/admin_dashboard.html";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("loadingOverlay").style.display = "none";
+                    msg.innerText = "Invalid User ID or Password";
+                });
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('loginModal');
+            if (event.target == modal) {
+                closeLoginModal();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
